@@ -73,7 +73,7 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.Users.tableName,
       Key: { email: body.email },
       UpdateExpression:
-        "SET = groups = :groups, updatedAt = :updatedAt",
+        "SET groups = :groups, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
         ":groups": body.groups,
         ":updatedAt": new Date().toISOString(),
