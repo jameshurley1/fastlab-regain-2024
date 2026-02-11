@@ -1,9 +1,4 @@
-/* tslint:disable */
-/* eslint-disable */
-/* deno-fmt-ignore-file */
-
-import "sst"
-export {}
+import "sst/node/api";
 
 declare module "sst/node/api" {
   export interface ApiResources {
