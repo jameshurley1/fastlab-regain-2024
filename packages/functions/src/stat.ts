@@ -71,10 +71,13 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.Stats.tableName,
       Key: { id: body.id },
       UpdateExpression:
-        "SET name = :name, description = :description, updatedAt = :updatedAt",
+        "SET userId = :userId, exerciseId = :exerciseId, pain = :pain, complexity = :complexity, comments = :comments, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":name": body.name,
-        ":description": body.description,
+        ":userId": body.userId,
+        ":exerciseId": body.exerciseId,
+        ":pain": body.pain,
+        ":complexity": body.complexity,
+        ":comments": body.comments,
         ":updatedAt": new Date().toISOString(),
       },
     };

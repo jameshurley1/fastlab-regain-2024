@@ -73,10 +73,9 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.Sessions.tableName,
       Key: { id: body.id },
       UpdateExpression:
-        "SET name = :name, description = :description, updatedAt = :updatedAt",
+        "SET userId = :userId, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":name": body.name,
-        ":description": body.description,
+        ":userId": body.userId,
         ":updatedAt": new Date().toISOString(),
       },
     };

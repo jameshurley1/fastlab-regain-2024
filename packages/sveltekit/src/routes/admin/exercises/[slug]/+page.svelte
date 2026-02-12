@@ -46,7 +46,7 @@
 </script>
 
 <svelte:head>
-	{#if currentMode.current === 'display' || 'edit'}
+	{#if currentMode.current === 'display' || currentMode.current === 'edit'}
 		<title>{currentExercise.current.title}</title>
 	{/if}
 	{#if currentMode.current === 'add'}

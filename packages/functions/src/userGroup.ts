@@ -18,7 +18,7 @@ export const getHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new GetCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Key: {
         id: key,
       },
@@ -45,7 +45,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new PutCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Item: { ...body },
     });
 
@@ -70,12 +70,13 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const params = {
-      TableName: Table.Users.tableName,
-      Key: { email: body.email },
+      TableName: Table.UserGroups.tableName,
+      Key: { id: body.id },
       UpdateExpression:
-        "SET = groups = :groups, updatedAt = :updatedAt",
+        "SET userId = :userId, groupId = :groupId, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":groups": body.groups,
+        ":userId": body.userId,
+        ":groupId": body.groupId,
         ":updatedAt": new Date().toISOString(),
       },
     };
@@ -102,7 +103,7 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
 export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
   try {
     const command = new ScanCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
     });
 
     const data = await documentClient.send(command);
@@ -126,7 +127,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new DeleteCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Key: {
         id: body.id,
       },

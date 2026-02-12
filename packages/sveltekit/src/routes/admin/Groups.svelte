@@ -32,7 +32,7 @@
 				variant="raised"
 				onclick={() => {
 					currentMode.current = 'add';
-					goto('/admin/groups/+');
+					goto('/admin/groups/new');
 				}}
 			>
 				ADD GROUP
