@@ -1,8 +1,8 @@
 import { createServer } from 'node:http';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, createReadStream, statSync } from 'node:fs';
 import { randomUUID, createHmac } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { dirname, join, extname } from 'node:path';
 
 // Simple JWT implementation for local dev (no jsonwebtoken dependency needed)
 const JWT_SECRET = 'local-dev-secret';
@@ -15,7 +15,18 @@ function createJwt(payload) {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH = join(__dirname, 'db.json');
+const FILES_DIR = join(__dirname, 'files');
 const PORT = 3001;
+
+const MIME_TYPES = {
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+};
 
 // --- JSON File Database ---
 
@@ -115,6 +126,44 @@ async function handleRequest(req, res) {
   // --- Presigned URL (returns a placeholder local URL) ---
   if (method === 'GET' && (params = match('/presignedurl/{uploadId}', pathname))) {
     return json(res, { url: `http://localhost:${PORT}/files/${params.uploadId}` });
+  }
+
+  // --- Static File Serving (videos and images) ---
+  if (method === 'GET' && pathname.startsWith('/files/')) {
+    const fileName = decodeURIComponent(pathname.slice('/files/'.length));
+    const filePath = join(FILES_DIR, fileName);
+    if (!existsSync(filePath)) {
+      res.writeHead(404, { 'Access-Control-Allow-Origin': 'http://localhost:3000' });
+      res.end('File not found');
+      return;
+    }
+    const ext = extname(fileName).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    const stat = statSync(filePath);
+
+    // Support range requests for video seeking
+    const range = req.headers.range;
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': end - start + 1,
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+      });
+      createReadStream(filePath, { start, end }).pipe(res);
+    } else {
+      res.writeHead(200, {
+        'Content-Length': stat.size,
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+      });
+      createReadStream(filePath).pipe(res);
+    }
+    return;
   }
 
   // =====================
