@@ -1,9 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
+
+const API_URL = 'http://localhost:3001';
 
 export const load = (async () => {
 	// Fetch all exercises.
-	const exerciseUrl = Api.regainApi.url + '/exercise/list';
+	const exerciseUrl = API_URL + '/exercise/list';
 	const exerciseResponse = await fetch(exerciseUrl);
 	const exercises = await exerciseResponse.json();
 
@@ -16,7 +17,7 @@ export const actions = {
 	async getKey({ request }: { request: Request }) {
 		const formData = await request.formData();
 		const key = formData.get('key')?.toString() || undefined;
-		const keyUrl = Api.regainApi.url + '/presignedurl/' + key;
+		const keyUrl = API_URL + '/presignedurl/' + key;
 		const keyResponse = await fetch(keyUrl);
 
 		return keyResponse.json();

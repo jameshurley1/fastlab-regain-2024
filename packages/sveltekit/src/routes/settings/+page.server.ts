@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
-import { Api } from 'sst/node/api';
+
+const API_URL = 'http://localhost:3001';
 
 export const actions = {
   async removeData({ request }: { request: Request }) {
@@ -23,7 +24,7 @@ export const actions = {
 
     try {
       // for each body part, send a POST request to the update userGroups endpoint
-      const userUpdateURL = `${Api.regainApi.url}/userGroup/create`;
+      const userUpdateURL = `${API_URL}/userGroup/create`;
 
       const updateResponse = await fetch(
         userUpdateURL,

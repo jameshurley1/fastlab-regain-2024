@@ -10,7 +10,7 @@
 	let author: string;
 	let newMessage: string;
 	let updatingId: string | null = null;
-	let helpMessages: string[] = [];
+	let helpMessages: HelpMessage[] = [];
 
 	onMount(() => {});
 
@@ -20,7 +20,7 @@
 		e.key === 'Enter' && newMessage !== null && submitMessage();
 	};
 
-	const handleEdit = async (e: any, message: string) => {
+	const handleEdit = async (e: any, message: HelpMessage) => {
 		e.key === 'Enter' && newMessage !== null && updateMessage(message);
 	};
 
@@ -28,7 +28,7 @@
 	const submitMessage = async () => {};
 
 	// Update the message.
-	const updateMessage = async (message: string) => {};
+	const updateMessage = async (message: HelpMessage) => {};
 
 	const deleteMessage = async (id: string) => {};
 

@@ -66,8 +66,16 @@ type Exercise = {
   videoKey: string;
   image?: string;
   video?: string;
+  groups?: Group[];
   createdAt: string;
   updatedAt: string;
+}
+
+type HelpMessage = {
+  id: string;
+  user?: { username: string };
+  content: string;
+  createdAt: string;
 }
 
 type Stat = {
