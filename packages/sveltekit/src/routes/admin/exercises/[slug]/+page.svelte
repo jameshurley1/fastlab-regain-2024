@@ -17,7 +17,7 @@
 	let video: object = [];
 	let thumbnail: object = [];
 	let exerciseVideo = $state(currentExercise.current.video || null);
-	let exerciseThumb = $state(currentExercise.current.video || null);
+	let exerciseThumb = $state(currentExercise.current.thumbnail || null);
 
 	let duration: number;
 
@@ -50,7 +50,7 @@
 		<title>{currentExercise.current.title}</title>
 	{/if}
 	{#if currentMode.current === 'add'}
-		<title>New Group</title>
+		<title>New Exercise</title>
 	{/if}
 </svelte:head>
 

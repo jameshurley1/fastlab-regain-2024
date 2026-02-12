@@ -30,7 +30,7 @@ export const getHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Item
         ? JSON.stringify(data.Item)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not found"),
     };
   } catch (err) {
     return {
@@ -55,7 +55,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Attributes
         ? JSON.stringify(data.Attributes)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not created"),
     };
   } catch (err) {
     return {
@@ -89,7 +89,7 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: updateResult.Attributes
         ? JSON.stringify(updateResult.Attributes)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not updated"),
     };
   } catch (err) {
     return {
@@ -112,7 +112,7 @@ export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Items
         ? JSON.stringify(data.Items)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroups not listed"),
     };
   } catch (err) {
     return {
@@ -138,7 +138,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data
         ? JSON.stringify(data)
-        : JSON.stringify("Error: Users not deleted"),
+        : JSON.stringify("Error: UserGroup not deleted"),
     };
   } catch (err) {
     return {

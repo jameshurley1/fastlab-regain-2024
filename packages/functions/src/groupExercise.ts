@@ -111,7 +111,7 @@ export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Items
         ? JSON.stringify(data.Items)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: GroupExercises not listed"),
     };
   } catch (err) {
     return {

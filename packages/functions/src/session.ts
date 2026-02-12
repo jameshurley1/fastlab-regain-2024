@@ -55,7 +55,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Attributes
         ? JSON.stringify(data.Attributes)
-        : JSON.stringify("Error: Sessions not listed"),
+        : JSON.stringify("Error: Session not created"),
     };
   } catch (err) {
     return {
@@ -137,7 +137,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data
         ? JSON.stringify(data)
-        : JSON.stringify("Error: Users not deleted"),
+        : JSON.stringify("Error: Session not deleted"),
     };
   } catch (err) {
     return {
