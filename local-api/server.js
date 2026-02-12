@@ -1,8 +1,17 @@
 import { createServer } from 'node:http';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHmac } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+
+// Simple JWT implementation for local dev (no jsonwebtoken dependency needed)
+const JWT_SECRET = 'local-dev-secret';
+function createJwt(payload) {
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
+  return `${header}.${body}.${signature}`;
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH = join(__dirname, 'db.json');
@@ -339,8 +348,11 @@ async function handleRequest(req, res) {
   // =====================
   if (method === 'POST' && pathname.startsWith('/auth/magicLink/authorize')) {
     const email = url.searchParams.get('email');
-    // In local dev, skip email and just log the callback URL
-    const token = Buffer.from(JSON.stringify({ userId: randomUUID(), email, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 180 })).toString('base64');
+    // Look up the actual user to get their real ID
+    const user = db.users.find((u) => u.email === email);
+    const userId = user ? user.id : randomUUID();
+    // Generate a proper JWT that jwt.decode() can parse
+    const token = createJwt({ userId, email, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 180 });
     const callbackUrl = `http://localhost:3000/auth/callback?token=${token}`;
     console.log(`\n  Magic link for ${email}:\n  ${callbackUrl}\n`);
     return json(res, { message: 'Magic link logged to console', callbackUrl });
