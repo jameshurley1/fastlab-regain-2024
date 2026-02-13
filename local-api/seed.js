@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -415,3 +415,34 @@ console.log(`Seeded database at ${DB_PATH}`);
 console.log(`  ${users.length} users`);
 console.log(`  ${groups.length} groups`);
 console.log(`  ${exercises.length} exercises`);
+
+// Generate placeholder images for local development
+const FILES_DIR = join(__dirname, 'files');
+if (!existsSync(FILES_DIR)) mkdirSync(FILES_DIR, { recursive: true });
+
+const groupColors = {
+  Head: '#4CAF50',
+  Shoulders: '#2196F3',
+  Arms: '#FF9800',
+  Chest: '#E91E63',
+  Stomach: '#9C27B0',
+  Legs: '#00BCD4',
+  Hands: '#FF5722',
+};
+
+let placeholderCount = 0;
+for (const exercise of exercises) {
+  const color = groupColors[exercise.groups[0]?.area] || '#607D8B';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360">
+  <rect width="640" height="360" fill="${color}"/>
+  <text x="320" y="160" text-anchor="middle" fill="white" font-family="sans-serif" font-size="28" font-weight="bold">${exercise.title}</text>
+  <text x="320" y="200" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="sans-serif" font-size="18">${exercise.groups.map(g => g.area).join(', ')}</text>
+  <text x="320" y="240" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="sans-serif" font-size="16">${exercise.time}s</text>
+</svg>`;
+
+  // Write as SVG (rename .jpg to .svg won't work, so write actual image key)
+  const imgPath = join(FILES_DIR, exercise.imageKey);
+  writeFileSync(imgPath, svg);
+  placeholderCount++;
+}
+console.log(`  ${placeholderCount} placeholder images generated in ${FILES_DIR}`);

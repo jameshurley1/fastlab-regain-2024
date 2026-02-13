@@ -60,6 +60,11 @@
 					>
 						{#if action.success === true && notfound === false}
 							<img src={action.key} alt="Video Thumbnail" loading="lazy" />
+						{:else if notfound || loaded}
+							<div class="placeholder">
+								<Icon class="material-icons">videocam</Icon>
+								<p>{exercise.title}</p>
+							</div>
 						{:else}
 							<div class="loader"></div>
 						{/if}
@@ -99,6 +104,23 @@
 		display: flex;
 		width: 100%;
 		flex-direction: column;
+	}
+	.placeholder {
+		display: flex;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		background-color: hsl(0, 0%, 92%);
+		color: hsl(0, 0%, 50%);
+	}
+	.placeholder p {
+		margin: 0.5em 0 0;
+		font-size: 0.8rem;
 	}
 	.loader {
 		display: flex;

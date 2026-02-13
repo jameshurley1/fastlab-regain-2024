@@ -138,8 +138,16 @@ async function handleRequest(req, res) {
       return;
     }
     const ext = extname(fileName).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    let contentType = MIME_TYPES[ext] || 'application/octet-stream';
     const stat = statSync(filePath);
+
+    // In local dev, placeholder images are SVGs with .jpg extension
+    if (['.jpg', '.jpeg', '.png'].includes(ext) && stat.size < 10000) {
+      try {
+        const peek = readFileSync(filePath, 'utf-8').slice(0, 5);
+        if (peek === '<svg ') contentType = 'image/svg+xml';
+      } catch {}
+    }
 
     // Support range requests for video seeking
     const range = req.headers.range;
