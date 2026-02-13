@@ -9,7 +9,10 @@ export default defineConfig({
 		host: '0.0.0.0',
 		port: 3000,
 		fs: {
-			allow: [path.resolve(__dirname, '../..')]
+			allow: [
+				path.resolve(__dirname, '../..'),
+				path.resolve(__dirname, '../../..')
+			]
 		}
 	},
 	plugins: [sveltekit()],
