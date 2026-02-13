@@ -8,10 +8,12 @@
 
 	const handleDifficult = (guage: number) => {
 		if (type === 'difficult') {
-			// Save the quage value with the video to a user Stat
+			// Save the gauge value with the video to a user Stat
+			console.log('Difficulty rating:', guage, 'for video:', video?.title);
 			difficult.current = false;
 		}	else {
-			// Save the quage value with the video to a user Stat
+			// Save the gauge value with the video to a user Stat
+			console.log('Pain rating:', guage, 'for video:', video?.title);
 			pain.current = false;
 		}
 	};
@@ -43,10 +45,10 @@
 		<Button style="background: #FF0D0D; color: white;" onclick={() => handleDifficult(6)}>Hard</Button>
 	</Actions>
 </Card>
-<spacer></spacer>
+<div class="spacer"></div>
 
 <style>
-	spacer {
+	.spacer {
 		display: flex;
 		padding: 1em;
 	}

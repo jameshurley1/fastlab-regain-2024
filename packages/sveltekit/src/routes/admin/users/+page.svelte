@@ -1,127 +1,47 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { v4 as uuidv4 } from 'uuid';
-	import CircularProgress from '@smui/circular-progress';
-	import Button from '@smui/button';
-	import { Icon } from '@smui/icon-button';
-	import Textfield from '@smui/textfield';
-	import Dialog, { Title, Content } from '@smui/dialog';
-	import { currentGroup, currentMode, user } from '$lib/utils/store';
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
+	import Card, { Content } from '@smui/card';
+	import Button from '@smui/button';
+	import { goto } from '$app/navigation';
+	import { currentUser, currentMode } from '$lib/utils/store';
 
-	let title = currentGroup.current.area || '';
-	let checkValid: boolean = $state(false);
-
-	let open: boolean = $state(false);
-
-	const handleEdit = () => {
-		if (currentMode.current === 'display') {
-			currentMode.current = 'edit';
-		} else {
-			currentMode.current = 'display';
-		}
-	};
-
-	const handleSave = async () => {
-		open = true;
-		if (currentMode.current === 'edit') {
-			open = false;
-			goto('/groups');
-
-			/*
-			editGroup({
-				id: currentGroup.current.id,
-				area: area,
-			});
-      */
-		} else if (currentMode.current === 'add') {
-			open = false;
-			goto('/groups');
-
-			/*
-			addGroup({
-				id: uuidv4(),
-				area: area,
-			});
-      */
-		}
-	};
-
-	$effect(() => {
-		checkValid = title !== '';
-	});
+	let { data } = $props();
 </script>
 
 <svelte:head>
-	{#if currentMode.current === 'display' || currentMode.current === 'edit'}
-		<title>{currentGroup.current.area}</title>
-	{/if}
-	{#if currentMode.current === 'add'}
-		<title>New Group</title>
-	{/if}
+	<title>Users</title>
 </svelte:head>
 
 <div class="wrap">
 	<header-panel>
 		<div></div>
 		<div>
-			{#if (user && currentMode.current === 'edit') || currentMode.current === 'add'}
-				<Button onclick={handleSave} disabled={!checkValid}>SAVE CHANGES</Button>
-			{/if}
-			{#if (user && currentMode.current === 'display') || currentMode.current === 'edit'}
-				<Button onclick={handleEdit} variant="raised">
-					{#if currentMode.current === 'display'}
-						EDIT
-					{:else}
-						CANCEL
-					{/if}
-				</Button>
-			{/if}
-			{#if currentMode.current === 'add' || currentMode.current === 'display'}
-				<Button onclick={() => goto('/admin/groups')} variant="raised">CANCEL</Button>
-			{/if}
+			<Button onclick={() => goto('/admin')} variant="raised">BACK</Button>
 		</div>
 	</header-panel>
 
 	<section>
 		<LayoutGrid style="width: 100%;">
-			<Cell span={12}>
-				<column>
-					<span>
-						<heading>Group Title</heading>
-						{#if currentMode.current === 'add' || currentMode.current === 'edit'}
-							<required>
-								<Icon class="material-icons required" on>star</Icon>
-							</required>
-						{/if}
-					</span>
-					<editor-wrap>
-						{#if currentMode.current === 'display'}
-							<group-title>{currentGroup.current.area}</group-title>
-						{:else}
-							<Textfield
-								style="width: 100%;"
-								variant="filled"
-								bind:value={currentGroup.current.area}
-								label="Title"
-								required
-							/>
-						{/if}
-					</editor-wrap>
-				</column>
-			</Cell>
+			{#if data?.users}
+				{#each data.users as u}
+					<Cell spanDevices={{ phone: 12, tablet: 6, desktop: 4 }}>
+						<Card style="border-radius: 16px;">
+							<Content>
+								<h3>{u.email}</h3>
+								<p>Onboarded: {u.onboard ? 'Yes' : 'No'}</p>
+								<p>Groups: {u.groups?.length || 0}</p>
+							</Content>
+						</Card>
+					</Cell>
+				{/each}
+			{:else}
+				<Cell span={12}>
+					<p>No users found.</p>
+				</Cell>
+			{/if}
 		</LayoutGrid>
 	</section>
 </div>
-
-<Dialog bind:open scrimClickAction="" escapeKeyAction="">
-	<Title id="simple-title">SAVING CHANGES</Title>
-	<Content id="simple-content">
-		<div style="display: flex; justify-content: center">
-			<CircularProgress style="height: 32px; width: 32px;" indeterminate />
-		</div>
-	</Content>
-</Dialog>
 
 <style>
 	.wrap {
@@ -138,9 +58,6 @@
 		justify-content: space-between;
 		width: 100vw;
 	}
-	editor-wrap {
-		padding: 1em 0em 1em 0em;
-	}
 	section {
 		display: flex;
 		flex-direction: column;
@@ -148,19 +65,5 @@
 		background: white;
 		padding: 0.5em;
 		margin: 0.5em;
-	}
-	column {
-		display: flex;
-		flex-direction: column;
-	}
-	heading {
-		font-size: 16px;
-		font-weight: 600;
-		padding: 1em 0em 1em 0em;
-	}
-	group-title {
-		display: flex;
-		position: relative;
-		padding: 1em 0em 1em 0em;
 	}
 </style>

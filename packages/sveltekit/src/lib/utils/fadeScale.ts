@@ -4,7 +4,7 @@ export const fadeScale = (
 ) => {
 	const o: number = +getComputedStyle(node).opacity;
 	const m: RegExpMatchArray | null = getComputedStyle(node).transform.match(/scale\(([0-9.]+)\)/);
-	const s: string | 1 = m ? m[1] : 1;
+	const s: number = m ? parseFloat(m[1]) : 1;
 	const is: number = 1 - baseScale;
 
 	return {
@@ -12,7 +12,7 @@ export const fadeScale = (
 		duration,
 		css: (t: number) => {
 			const eased: number = easing(t);
-			return `opacity: ${eased * o}; transform: scale(${eased * (s as number) * is + baseScale})`;
+			return `opacity: ${eased * o}; transform: scale(${eased * s * is + baseScale})`;
 		}
 	};
 };

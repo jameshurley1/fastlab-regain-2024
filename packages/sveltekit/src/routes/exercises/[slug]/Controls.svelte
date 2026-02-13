@@ -11,7 +11,7 @@
     return videoElement?.paused;
   });
 
-  $inspect('Are we fucking paused or not?', isPaused); // Why is this incorrect?
+
 </script>
 
 <Card style="border-radius: 16px;">
@@ -19,7 +19,7 @@
     <div class="spacer">
       <IconButton style="background: gray" onclick={() => { if (videoElement) videoElement.currentTime = 0 }} class="material-icons">reply_all</IconButton>
     </div>
-    {#if !isPaused}
+    {#if isPaused}
       <div class="spacer">
         <IconButton style="background: gray" onclick={() => { if (videoElement) videoElement?.play() }} class="material-icons">play_arrow</IconButton>
       </div>

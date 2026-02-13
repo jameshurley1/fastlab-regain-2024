@@ -5,7 +5,7 @@ export const setupUserExercises = async (exercises: Exercise[], usersettings: Us
 
 	for (let i = 0; i < exercises.length; i++) {
 		for (let j = 0; j < usersettings.groups.length; j++) {
-			if (userGroups.current[j].id === exercises[0]) {
+			if (usersettings.groups[j].id === exercises[i].groups?.[0]?.id) {
 				exerciseList.push(exercises[i]);
 			}
 		}
