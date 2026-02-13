@@ -14,5 +14,8 @@ node_modules
 # local env files
 .env*.local
 
-# local dev database
+# local dev database and generated files
 local-api/db.json
+local-api/files/*.jpg
+local-api/files/*.mp4
+local-api/files/*.png
