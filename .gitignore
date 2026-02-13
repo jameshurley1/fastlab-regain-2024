@@ -19,3 +19,6 @@ local-api/db.json
 local-api/files/*.jpg
 local-api/files/*.mp4
 local-api/files/*.png
+
+# local video symlink
+local-api/videos
