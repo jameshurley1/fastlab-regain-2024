@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import Card, { Content, Actions } from '@smui/card';
@@ -39,12 +39,15 @@
 		submitting = true;
 		return async ({ result }: { result: any }) => {
 			submitting = false;
-			if (result.data.url) {
+			if (result.data?.url) {
 				action = { success: result.status === 200, key: result.data.url };
 				const url = await fetch(action.key);
 				if (url.status === 404) {
 					notfound = true;
 				}
+				loaded = true;
+			} else {
+				notfound = true;
 				loaded = true;
 			}
 		};

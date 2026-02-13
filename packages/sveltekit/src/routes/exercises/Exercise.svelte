@@ -29,12 +29,15 @@
 		submitting = true;
 		return async ({ result }: { result: any }) => {
 			submitting = false;
-			if (result.data.url) {
+			if (result.data?.url) {
 				action = { success: result.status === 200, key: result.data.url };
 				const url = await fetch(action.key);
 				if (url.status === 404) {
 					notfound = true;
 				}
+				loaded = true;
+			} else {
+				notfound = true;
 				loaded = true;
 			}
 		};
