@@ -347,8 +347,11 @@
 		cursor: pointer;
 	}
 	.human-body svg:hover path {
-		fill: #132a13;
-	}
+    fill: #132a13;
+}
+.human-body svg:hover path.active {
+    fill: #ff7d16;
+}
 	path.active {
 		fill: #ff7d16;
 	}
