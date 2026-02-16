@@ -66,7 +66,7 @@ The app is fully functional in local dev mode:
 
 ## Backups
 
-- `backup_260216` — snapshot of main created 16 Feb 2026 at ~4:27pm
+- `backup_260216` — snapshot of main updated 16 Feb 2026 at ~4:35pm (includes CLAUDE.md update)
 
 ## Notes
 
