@@ -56,6 +56,16 @@ In chronological order:
 10. Fixed ECONNREFUSED on macOS: use 127.0.0.1 instead of localhost
 11. Added video file lookup in local-api/videos/ symlink directory and 720p subfolder
 
+## In Progress (branch: claude/review-context-Sa5MA)
+
+12. Exercise completion now navigates to `/exercises` instead of `/progress`
+13. Added VLC-style timeline overlay to video player (`Video.svelte`):
+    - Play/pause button with SVG icons showing current state
+    - Seekable progress bar (click to jump) with green fill
+    - Current time / total duration in `m:ss` format
+    - Auto-hides after 4 seconds of no mouse movement, fades back on hover
+    - **Not yet tested** — requires real video files in `local-api/files/` (placeholder 404s bypass the Video component entirely)
+
 ## Current State
 
 The app is fully functional in local dev mode:
