@@ -41,7 +41,7 @@ The `LOCAL_DEV=true` env var switches the SvelteKit app to use the local API at 
 - `/admin/exercises`, `/admin/groups`, `/admin/users` - Admin CRUD
 - `/auth/login` - Magic link login
 
-## What's Been Fixed (this branch: claude/review-repo-fixes-odtqZ)
+## What's Been Fixed (merged to main, 16 Feb 2026)
 
 In chronological order:
 1. Added local development setup (mock API, seed script, JSON DB) so the app runs without AWS
@@ -53,6 +53,8 @@ In chronological order:
 7. Fixed exercises page to filter by selected body parts
 8. Fixed video loading with correct types import and error handling
 9. Added generated files (placeholder images, video symlinks) to .gitignore
+10. Fixed ECONNREFUSED on macOS: use 127.0.0.1 instead of localhost
+11. Added video file lookup in local-api/videos/ symlink directory and 720p subfolder
 
 ## Current State
 
@@ -61,6 +63,10 @@ The app is fully functional in local dev mode:
 - Auth flow works with magic links printed to console
 - Exercise browsing, filtering by body area, and video playback all work
 - Admin CRUD pages are functional
+
+## Backups
+
+- `backup_260216` — snapshot of main created 16 Feb 2026 at ~4:27pm
 
 ## Notes
 
