@@ -121,7 +121,7 @@
 		isCompleted.current = false;
 
 		setTimeout(() => {
-			goto('/progress');
+			goto('/exercises');
 		}, 4000);
 	};
 
