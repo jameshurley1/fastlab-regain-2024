@@ -137,6 +137,10 @@ async function handleRequest(req, res) {
     if (!existsSync(filePath) && existsSync(join(VIDEOS_DIR, fileName))) {
       filePath = join(VIDEOS_DIR, fileName);
     }
+    // Check in 720p subfolder
+    if (!existsSync(filePath) && existsSync(join(VIDEOS_DIR, 'fastlab-regain-videoassets 720p', fileName))) {
+      filePath = join(VIDEOS_DIR, 'fastlab-regain-videoassets 720p', fileName);
+    }
     if (!existsSync(filePath)) {
       res.writeHead(404, { 'Access-Control-Allow-Origin': 'http://localhost:3000' });
       res.end('File not found');
