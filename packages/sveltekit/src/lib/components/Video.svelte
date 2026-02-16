@@ -21,10 +21,6 @@
 		showControlsTimeout = setTimeout(() => (showControls = false), 4000);
 	};
 
-	const handleContainerMove = (e: MouseEvent | TouchEvent) => {
-		resetControlsTimer();
-	};
-
 	const handleMove = (e: any) => {
 		resetControlsTimer();
 
@@ -49,8 +45,10 @@
 		isPaused.current = false;
 		let date = new Date();
 		if ((date as any) - (lastMouseDown as any) < 300) {
-			if (paused) e.target.play();
-			else e.target.pause();
+			if (videoElement) {
+				if (paused) videoElement.play();
+				else videoElement.pause();
+			}
 		}
 	};
 
@@ -97,8 +95,10 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="container"
-	onmousemove={handleContainerMove}
-	ontouchmove={handleContainerMove}
+	onmousemove={handleMove}
+	ontouchmove={handleMove}
+	onmousedown={handleMousedown}
+	onmouseup={handleMouseup}
 >
 	<div class="playback-animation">
 		<svg class="playback-icons">
@@ -109,10 +109,6 @@
 
 	<video
 		bind:this={videoElement}
-		onmousemove={handleMove}
-		ontouchmove={handleMove}
-		onmousedown={handleMousedown}
-		onmouseup={handleMouseup}
 		bind:currentTime={time}
 		bind:duration
 		bind:paused
@@ -162,10 +158,10 @@
 		border-radius: 16px;
 		justify-content: center;
 		align-items: center;
+		overflow: hidden;
 	}
 	video {
 		border-radius: 16px;
-		pointer-events: none;
 	}
 	.playback-animation {
 		pointer-events: none;
@@ -189,6 +185,7 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
+		z-index: 10;
 		display: flex;
 		align-items: center;
 		gap: 8px;
