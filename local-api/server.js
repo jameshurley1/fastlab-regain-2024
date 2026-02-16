@@ -16,6 +16,7 @@ function createJwt(payload) {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH = join(__dirname, 'db.json');
 const FILES_DIR = join(__dirname, 'files');
+const VIDEOS_DIR = join(__dirname, 'videos');
 const PORT = 3001;
 
 const MIME_TYPES = {
@@ -131,7 +132,11 @@ async function handleRequest(req, res) {
   // --- Static File Serving (videos and images) ---
   if (method === 'GET' && pathname.startsWith('/files/')) {
     const fileName = decodeURIComponent(pathname.slice('/files/'.length));
-    const filePath = join(FILES_DIR, fileName);
+    let filePath = join(FILES_DIR, fileName);
+    // Fall back to videos symlink directory (e.g. OneDrive) for .mp4 files
+    if (!existsSync(filePath) && existsSync(join(VIDEOS_DIR, fileName))) {
+      filePath = join(VIDEOS_DIR, fileName);
+    }
     if (!existsSync(filePath)) {
       res.writeHead(404, { 'Access-Control-Allow-Origin': 'http://localhost:3000' });
       res.end('File not found');
