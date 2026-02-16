@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "sst dev",
+    "dev:local": "concurrently \"node local-api/server.js\" \"cd packages/sveltekit && LOCAL_DEV=true npx vite dev\"",
+    "dev:api": "node local-api/server.js",
+    "dev:seed": "node local-api/seed.js",
     "build": "sst build",
     "deploy": "sst deploy",
     "remove": "sst remove",
@@ -14,6 +17,7 @@
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",
     "aws-cdk-lib": "2.161.1",
+    "concurrently": "^9.2.1",
     "constructs": "10.3.0",
     "sst": "^2",
     "typescript": "^5.7.2"

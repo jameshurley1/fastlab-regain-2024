@@ -73,10 +73,10 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.GroupExercises.tableName,
       Key: { id: body.id },
       UpdateExpression:
-        "SET name = :name, description = :description, updatedAt = :updatedAt",
+        "SET groupId = :groupId, exerciseId = :exerciseId, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":name": body.name,
-        ":description": body.description,
+        ":groupId": body.groupId,
+        ":exerciseId": body.exerciseId,
         ":updatedAt": new Date().toISOString(),
       },
     };
@@ -111,7 +111,7 @@ export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Items
         ? JSON.stringify(data.Items)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: GroupExercises not listed"),
     };
   } catch (err) {
     return {

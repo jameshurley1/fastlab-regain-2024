@@ -4,6 +4,7 @@
 	import List, { Item, Text } from '@smui/list';
 	import Exercises from './Exercises.svelte';
 	import Groups from './Groups.svelte';
+	import Users from './Users.svelte';
 
 	let open = $state(true);
 	let active = $state('Groups');

@@ -18,7 +18,7 @@ export const getHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new GetCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Key: {
         id: key,
       },
@@ -30,7 +30,7 @@ export const getHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Item
         ? JSON.stringify(data.Item)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not found"),
     };
   } catch (err) {
     return {
@@ -45,7 +45,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new PutCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Item: { ...body },
     });
 
@@ -55,7 +55,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Attributes
         ? JSON.stringify(data.Attributes)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not created"),
     };
   } catch (err) {
     return {
@@ -70,12 +70,13 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const params = {
-      TableName: Table.Users.tableName,
-      Key: { email: body.email },
+      TableName: Table.UserGroups.tableName,
+      Key: { id: body.id },
       UpdateExpression:
-        "SET = groups = :groups, updatedAt = :updatedAt",
+        "SET userId = :userId, groupId = :groupId, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":groups": body.groups,
+        ":userId": body.userId,
+        ":groupId": body.groupId,
         ":updatedAt": new Date().toISOString(),
       },
     };
@@ -88,7 +89,7 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: updateResult.Attributes
         ? JSON.stringify(updateResult.Attributes)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroup not updated"),
     };
   } catch (err) {
     return {
@@ -102,7 +103,7 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
 export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
   try {
     const command = new ScanCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
     });
 
     const data = await documentClient.send(command);
@@ -111,7 +112,7 @@ export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Items
         ? JSON.stringify(data.Items)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: UserGroups not listed"),
     };
   } catch (err) {
     return {
@@ -126,7 +127,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
 
   try {
     const command = new DeleteCommand({
-      TableName: Table.Users.tableName,
+      TableName: Table.UserGroups.tableName,
       Key: {
         id: body.id,
       },
@@ -137,7 +138,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data
         ? JSON.stringify(data)
-        : JSON.stringify("Error: Users not deleted"),
+        : JSON.stringify("Error: UserGroup not deleted"),
     };
   } catch (err) {
     return {

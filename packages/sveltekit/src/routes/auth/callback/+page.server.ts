@@ -5,6 +5,11 @@ import { SESSION_COOKIE_NAME } from '$lib/utils/constants.js';
 import { createSessionForUser } from '$lib/utils/auth.js';
 import { Api } from 'sst/node/api'
 
+type UserToken = {
+	userId: string;
+	email: string;
+};
+
 export const load: PageServerLoad = async ({ cookies, url }) => {
 	// Extract authentication token from URL query parameters
 	const token = url.searchParams.get('token') ?? '';
@@ -30,14 +35,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const getUserURL = `${Api.regainApi.url}/user/getUserByEmail/${decodedUser.email}`;
 	const userResponse = await fetch(getUserURL);
 
-	const user = await userResponse.json();
-
 	if (!userResponse.ok) {
 		return {
 			success: false,
 			error: 'Failed to fetch user, this error has been logged with FASTlab.'
 		};
 	}
+
+	const user = await userResponse.json();
 
 	return {
 		user

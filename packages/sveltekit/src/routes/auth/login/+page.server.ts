@@ -1,7 +1,8 @@
 import type { Actions } from './$types';
 import { randomUUID } from 'crypto';
+import { Api } from 'sst/node/api';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = Api.regainApi.url;
 
 export const actions = {
   async magicLinks({ request }: { request: Request }) {
@@ -42,7 +43,10 @@ export const actions = {
             error: 'Failed to create user, this error has been logged with FASTlab.'
           };
         }
-      } else {
+      }
+
+      // Send magic link for both new and existing users
+      {
         const userAuthURL = `${API_URL}/auth/magicLink/authorize?email=${email}`;
         const magicLinkResponse = await fetch(userAuthURL, {
           method: 'POST',

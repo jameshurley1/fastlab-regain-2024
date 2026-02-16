@@ -35,7 +35,7 @@
 				variant="raised"
 				onclick={() => {
 					currentMode.current = 'add';
-					goto('/admin/exercises/+');
+					goto('/admin/exercises/new');
 				}}
 			>
 				ADD EXERCISE

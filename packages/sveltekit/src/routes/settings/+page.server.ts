@@ -28,7 +28,7 @@ export const actions = {
       const updateResponse = await fetch(
         userUpdateURL,
         {
-          method: 'PUT',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: email,

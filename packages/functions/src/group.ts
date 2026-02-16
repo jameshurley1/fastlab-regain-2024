@@ -73,10 +73,9 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.Groups.tableName,
       Key: { id: body.id },
       UpdateExpression:
-        "SET name = :name, description = :description, updatedAt = :updatedAt",
+        "SET title = :title, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":name": body.name,
-        ":description": body.description,
+        ":title": body.title,
         ":updatedAt": new Date().toISOString(),
       },
     };
@@ -111,7 +110,7 @@ export const listHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Items
         ? JSON.stringify(data.Items)
-        : JSON.stringify("Error: Users not listed"),
+        : JSON.stringify("Error: Groups not listed"),
     };
   } catch (err) {
     return {

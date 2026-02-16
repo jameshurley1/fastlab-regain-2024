@@ -55,7 +55,7 @@ export const createHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data.Attributes
         ? JSON.stringify(data.Attributes)
-        : JSON.stringify("Error: Sessions not listed"),
+        : JSON.stringify("Error: Session not created"),
     };
   } catch (err) {
     return {
@@ -73,10 +73,9 @@ export const updateHandler: APIGatewayProxyHandlerV2 = async (event) => {
       TableName: Table.Sessions.tableName,
       Key: { id: body.id },
       UpdateExpression:
-        "SET name = :name, description = :description, updatedAt = :updatedAt",
+        "SET userId = :userId, updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":name": body.name,
-        ":description": body.description,
+        ":userId": body.userId,
         ":updatedAt": new Date().toISOString(),
       },
     };
@@ -138,7 +137,7 @@ export const deleteHandler: APIGatewayProxyHandlerV2 = async (event) => {
       statusCode: 200,
       body: data
         ? JSON.stringify(data)
-        : JSON.stringify("Error: Users not deleted"),
+        : JSON.stringify("Error: Session not deleted"),
     };
   } catch (err) {
     return {
