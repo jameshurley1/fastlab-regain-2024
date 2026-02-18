@@ -437,7 +437,7 @@ for (const exercise of exercises) {
   <rect width="640" height="360" fill="${color}"/>
   <text x="320" y="160" text-anchor="middle" fill="white" font-family="sans-serif" font-size="28" font-weight="bold">${exercise.title}</text>
   <text x="320" y="200" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="sans-serif" font-size="18">${exercise.groups.map(g => g.area).join(', ')}</text>
-  <text x="320" y="240" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="sans-serif" font-size="16">${exercise.time}s</text>
+  <text x="320" y="240" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="sans-serif" font-size="16">${Math.floor(exercise.time / 60)}:${String(exercise.time % 60).padStart(2, '0')}</text>
 </svg>`;
 
   // Write as SVG (rename .jpg to .svg won't work, so write actual image key)
