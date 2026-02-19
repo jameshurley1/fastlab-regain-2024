@@ -6,8 +6,10 @@
 	let users = $state([]);
 
 	onMount(async () => {
+		console.log('onMount firing');
 		const response = await fetch('http://127.0.0.1:3001/user/list');
 		users = await response.json();
+		console.log(users);
 	});
 </script>
 
