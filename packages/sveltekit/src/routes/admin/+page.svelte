@@ -6,6 +6,8 @@
 	import Groups from './Groups.svelte';
 	import Users from './Users.svelte';
 
+	let { data } = $props();
+
 	let open = $state(true);
 	let active = $state('Groups');
 
@@ -55,7 +57,7 @@
 				</Label></Button
 			>
 			{#if active === 'Users'}
-				<Users />
+				<Users {data} />
 			{/if}
 			{#if active === 'Exercises'}
 				<Exercises />
