@@ -74,3 +74,9 @@ The app is fully functional in local dev mode:
 - The seed script generates placeholder images in `local-api/files/`
 - Magic link tokens are printed to the dev server console (not emailed locally)
 - Production deploys to `regain.michaelcuneo.com.au` on AWS (ap-southeast-2)
+
+## Branch Instructions
+Always work on the `main` branch. At the start of every session:
+1. Run `git checkout main`
+2. Run `git pull origin main`
+Never create or push to a `claude/...` branch unless explicitly asked.
