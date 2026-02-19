@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 
+	console.log('USERS COMPONENT LOADED');
+
 	let users = $state([]);
 
 	onMount(async () => {
