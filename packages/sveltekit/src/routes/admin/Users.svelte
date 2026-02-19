@@ -1,11 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import Card, { Content } from '@smui/card';
 
 	let users = $state([]);
 
 	onMount(async () => {
+		if (!browser) return;
 		console.log('onMount firing');
 		const response = await fetch('http://127.0.0.1:3001/user/list');
 		users = await response.json();
