@@ -20,6 +20,6 @@
 
 <style>
 	p {
-		color: white;
+		color: white !important;
 	}
 </style>
