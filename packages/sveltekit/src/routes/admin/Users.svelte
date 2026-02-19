@@ -1,10 +1,14 @@
 <script>
+	import { onMount } from 'svelte';
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import Card, { Content } from '@smui/card';
 
-	import { user } from '$lib/utils/store';
+	let users = $state([]);
 
-	let { data } = $props();
+	onMount(async () => {
+		const response = await fetch('http://127.0.0.1:3001/user/list');
+		users = await response.json();
+	});
 </script>
 
 <svelte:head>
@@ -12,9 +16,9 @@
 </svelte:head>
 
 <posts-panel>
-	{#if data?.users}
+	{#if users.length > 0}
 		<LayoutGrid>
-			{#each data.users as u}
+			{#each users as u}
 				<Cell spanDevices={{ phone: 12, tablet: 4, desktop: 3 }}>
 					<Card style="border-radius: 16px;">
 						<Content>
