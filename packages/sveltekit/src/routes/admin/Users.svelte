@@ -13,13 +13,7 @@
 	});
 </script>
 
-<p>Users: {users.length}</p>
+<p style="color: white">Users: {users.length}</p>
 {#each users as u}
-	<p>{u.email}</p>
+	<p style="color: white">{u.email}</p>
 {/each}
-
-<style>
-	p {
-		color: white !important;
-	}
-</style>
