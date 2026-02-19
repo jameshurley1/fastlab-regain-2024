@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
-	import Card, { Content } from '@smui/card';
+	import Paper, { Content } from '@smui/paper';
 
 	let users = $state([]);
 
@@ -24,13 +24,13 @@
 		<LayoutGrid>
 			{#each users as u}
 				<Cell spanDevices={{ phone: 12, tablet: 4, desktop: 3 }}>
-					<Card style="border-radius: 16px;">
+					<Paper style="border-radius: 16px; padding: 1em;">
 						<Content>
 							<h3>{u.email}</h3>
 							<p>Onboarded: {u.onboard ? 'Yes' : 'No'}</p>
 							<p>Groups: {u.groups?.length || 0}</p>
 						</Content>
-					</Card>
+					</Paper>
 				</Cell>
 			{/each}
 		</LayoutGrid>
