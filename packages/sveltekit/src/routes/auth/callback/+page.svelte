@@ -31,11 +31,11 @@
 					<p>Wait 10 seconds to be automatically redirected, or click next to skip.</p>
 					<Button variant="raised" onclick={() => goto('/settings')}>Next</Button>
 				{:else}
-					<input hidden name="location" value="/" />
+					<input hidden name="location" value="/settings" />
 					<p>Looks like you've been using Regain before.</p>
 					<p>You will be redirected to your regular scheduled exercises.</p>
 					<p>Wait 10 seconds to be automatically redirected, or click next to skip.</p>
-					<Button variant="raised" onclick={() => goto('/')}>Next</Button>
+					<Button variant="raised" onclick={() => goto('/settings')}>Next</Button>
 				{/if}
 			</form>
 		</Content>
