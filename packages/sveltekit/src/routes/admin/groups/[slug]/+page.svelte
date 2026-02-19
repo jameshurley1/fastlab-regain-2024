@@ -26,7 +26,7 @@
 		open = true;
 		if (currentMode.current === 'edit') {
 			open = false;
-			goto('/groups');
+			goto('/admin');
 
 			/*
 			editGroup({
@@ -36,7 +36,7 @@
       */
 		} else if (currentMode.current === 'add') {
 			open = false;
-			goto('/groups');
+			goto('/admin');
 
 			/*
 			addGroup({
