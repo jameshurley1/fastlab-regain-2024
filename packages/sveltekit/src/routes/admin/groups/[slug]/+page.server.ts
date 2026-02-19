@@ -1,8 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
+
+const API_URL = 'http://127.0.0.1:3001';
 
 export const load = (async ({ params }) => {
-	const groupUrl = Api.regainApi.url + '/group/get/' + params.slug;
+	const groupUrl = API_URL + '/group/get/' + params.slug;
 	const groupResponse = await fetch(groupUrl);
 	const group = await groupResponse.json();
 

@@ -1,13 +1,11 @@
 import type { Actions, PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
+
+const API_URL = 'http://127.0.0.1:3001';
 
 export const load = (async () => {
-	const usersUrl = Api.regainApi.url + '/user/list';
-	console.log('[admin load] fetching:', usersUrl);
+	const usersUrl = API_URL + '/user/list';
 	const usersResponse = await fetch(usersUrl);
-	console.log('[admin load] response status:', usersResponse.status);
 	const users = await usersResponse.json();
-	console.log('[admin load] users:', JSON.stringify(users));
 
 	return { users };
 }) satisfies PageServerLoad;
@@ -16,7 +14,7 @@ export const actions = {
 	async getKey({ request }: { request: Request }) {
 		const formData = await request.formData();
 		const key = formData.get('key')?.toString() || undefined;
-		const keyUrl = Api.regainApi.url + '/presignedurl/' + key;
+		const keyUrl = API_URL + '/presignedurl/' + key;
 		const keyResponse = await fetch(keyUrl);
 
 		return keyResponse.json();
