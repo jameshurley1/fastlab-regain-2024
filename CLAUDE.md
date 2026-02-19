@@ -80,3 +80,8 @@ Always work on the `main` branch. At the start of every session:
 1. Run `git checkout main`
 2. Run `git pull origin main`
 Never create or push to a `claude/...` branch unless explicitly asked.
+
+## Session Startup
+At the start of every session, before doing anything else, automatically run:
+git checkout main
+git pull origin main
