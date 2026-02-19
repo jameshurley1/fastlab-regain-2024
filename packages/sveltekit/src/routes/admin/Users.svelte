@@ -17,3 +17,9 @@
 {#each users as u}
 	<p>{u.email}</p>
 {/each}
+
+<style>
+	p {
+		color: white;
+	}
+</style>
