@@ -4,47 +4,64 @@
 	const API = 'http://127.0.0.1:3001';
 
 	let users: User[] = $state([]);
-	let allExercises: Exercise[] = $state([]);
+	let allExercises: (Exercise & { groups?: { id: string; area: string }[] })[] = $state([]);
+	let allGroups: Group[] = $state([]);
+
 	let selectedUser: User | null = $state(null);
-	// Working copy of the selected user's exercise assignments (exerciseId → targetReps)
+	// Working copies — edited locally, saved together in one call
+	let draftGroups: Group[] = $state([]);
 	let draftExercises: UserExercise[] = $state([]);
+
 	let saving = $state(false);
 	let saveMsg = $state('');
 
 	onMount(async () => {
-		const [usersRes, exRes] = await Promise.all([
+		const [usersRes, exRes, groupsRes] = await Promise.all([
 			fetch(`${API}/user/list`),
-			fetch(`${API}/exercise/list`)
+			fetch(`${API}/exercise/list`),
+			fetch(`${API}/group/list`)
 		]);
 		users = await usersRes.json();
 		allExercises = await exRes.json();
+		allGroups = await groupsRes.json();
 	});
 
 	function selectUser(u: User) {
 		selectedUser = u;
-		// Deep-copy so edits don't mutate the store directly
+		draftGroups = (u.groups ?? []).map((g) => ({ ...g }));
 		draftExercises = (u.exercises ?? []).map((e) => ({ ...e }));
 		saveMsg = '';
 	}
 
-	// Exercises that belong to any of the user's groups
+	// Toggle a body-area group in/out of draftGroups
+	function toggleGroup(group: Group) {
+		const idx = draftGroups.findIndex((g) => g.id === group.id);
+		if (idx >= 0) {
+			draftGroups = draftGroups.filter((g) => g.id !== group.id);
+		} else {
+			draftGroups = [...draftGroups, { ...group }];
+		}
+	}
+
+	function isGroupActive(groupId: string): boolean {
+		return draftGroups.some((g) => g.id === groupId);
+	}
+
+	// Exercises that belong to any group currently in draftGroups.
+	// Uses the embedded .groups array that seed.js writes onto each exercise.
 	const userGroupExercises = $derived.by(() => {
-		if (!selectedUser) return [];
-		const userAreaNames = new Set((selectedUser.groups ?? []).map((g: any) => g.area));
-		return allExercises.filter((ex: Exercise) =>
-			(ex as any).groups?.some((g: any) => userAreaNames.has(g.area))
+		const activeAreaNames = new Set(draftGroups.map((g) => g.area));
+		if (activeAreaNames.size === 0) return [];
+		return allExercises.filter((ex) =>
+			(ex.groups ?? []).some((g) => activeAreaNames.has(g.area))
 		);
 	});
 
-	// All exercises not already assigned (for the "add" dropdown)
+	// Exercises from userGroupExercises not yet assigned
 	const unassigned = $derived.by(() => {
 		const assigned = new Set(draftExercises.map((e) => e.exerciseId));
 		return userGroupExercises.filter((ex) => !assigned.has(ex.id));
 	});
-
-	function getTargetReps(exerciseId: string): number {
-		return draftExercises.find((e) => e.exerciseId === exerciseId)?.targetReps ?? 0;
-	}
 
 	function setTargetReps(exerciseId: string, value: number) {
 		const idx = draftExercises.findIndex((e) => e.exerciseId === exerciseId);
@@ -62,19 +79,23 @@
 		draftExercises = draftExercises.filter((e) => e.exerciseId !== exerciseId);
 	}
 
-	async function saveTargets() {
+	// Single save: persist both groups and exercises together via /user/update
+	async function saveUser() {
 		if (!selectedUser) return;
 		saving = true;
 		saveMsg = '';
 		try {
-			const res = await fetch(`${API}/user/updateExerciseTargets`, {
+			const res = await fetch(`${API}/user/update`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: selectedUser.email, exercises: draftExercises })
+				body: JSON.stringify({
+					email: selectedUser.email,
+					groups: draftGroups,
+					exercises: draftExercises
+				})
 			});
 			if (res.ok) {
 				const updated: User = await res.json();
-				// Sync back into the users list
 				users = users.map((u) => (u.email === updated.email ? updated : u));
 				selectedUser = updated;
 				saveMsg = 'Saved!';
@@ -88,7 +109,6 @@
 		}
 	}
 
-	// Look up exercise title by id
 	function exerciseTitle(id: string): string {
 		return allExercises.find((e) => e.id === id)?.title ?? id;
 	}
@@ -97,7 +117,7 @@
 </script>
 
 <div class="users-layout">
-	<!-- User list panel -->
+	<!-- ── Left: user list ── -->
 	<div class="user-list">
 		<h3>Users ({users.length})</h3>
 		{#each users as u}
@@ -112,18 +132,34 @@
 		{/each}
 	</div>
 
-	<!-- Detail panel -->
+	<!-- ── Right: detail panel ── -->
 	{#if selectedUser}
 		<div class="user-detail">
 			<h3>{selectedUser.email}</h3>
-			<p class="groups-label">
-				Groups: {(selectedUser.groups ?? []).map((g: any) => g.area).join(', ') || '—'}
-			</p>
 
-			<h4>Assigned exercises &amp; target reps</h4>
+			<!-- ── Groups section ── -->
+			<h4>Body area groups</h4>
+			<p class="section-hint">Tick the areas affected by this patient's stroke.</p>
+			<div class="group-grid">
+				{#each allGroups as group}
+					<label class="group-chip" class:active={isGroupActive(group.id)}>
+						<input
+							type="checkbox"
+							checked={isGroupActive(group.id)}
+							onchange={() => toggleGroup(group)}
+						/>
+						{group.area}
+					</label>
+				{/each}
+			</div>
 
-			{#if draftExercises.length === 0}
-				<p class="empty-msg">No exercises assigned yet.</p>
+			<!-- ── Exercises section ── -->
+			<h4 style="margin-top: 1.75rem;">Assigned exercises &amp; target reps</h4>
+
+			{#if draftGroups.length === 0}
+				<p class="empty-msg">Assign at least one body area above to unlock exercises.</p>
+			{:else if draftExercises.length === 0}
+				<p class="empty-msg">No exercises assigned yet — use the dropdown below to add some.</p>
 			{:else}
 				<table class="exercise-table">
 					<thead>
@@ -175,7 +211,10 @@
 					</select>
 					<button
 						class="add-btn"
-						onclick={() => { addExercise(addSelectValue); addSelectValue = ''; }}
+						onclick={() => {
+							addExercise(addSelectValue);
+							addSelectValue = '';
+						}}
 						disabled={!addSelectValue}
 					>
 						<i class="material-icons">add</i> Add
@@ -183,8 +222,9 @@
 				</div>
 			{/if}
 
+			<!-- ── Save ── -->
 			<div class="save-row">
-				<button class="save-btn" onclick={saveTargets} disabled={saving}>
+				<button class="save-btn" onclick={saveUser} disabled={saving}>
 					{saving ? 'Saving…' : 'Save'}
 				</button>
 				{#if saveMsg}
@@ -194,7 +234,7 @@
 		</div>
 	{:else}
 		<div class="user-detail empty">
-			<p>Select a user to view and edit their exercise targets.</p>
+			<p>Select a user to view and edit their profile.</p>
 		</div>
 	{/if}
 </div>
@@ -209,7 +249,7 @@
 		box-sizing: border-box;
 	}
 
-	/* ---- User list ---- */
+	/* ── User list ── */
 	.user-list {
 		min-width: 220px;
 		display: flex;
@@ -249,27 +289,29 @@
 		opacity: 0.7;
 	}
 
-	/* ---- Detail panel ---- */
+	/* ── Detail panel ── */
 	.user-detail {
 		flex: 1;
+		overflow-y: auto;
 	}
 	.user-detail h3 {
 		margin: 0 0 0.25rem;
 		font-size: 1.3rem;
 	}
 	.user-detail h4 {
-		margin: 1.25rem 0 0.5rem;
+		margin: 1.25rem 0 0.4rem;
 		font-size: 1rem;
 		opacity: 0.85;
 	}
-	.groups-label {
-		margin: 0;
-		font-size: 0.9rem;
-		opacity: 0.6;
+	.section-hint {
+		margin: 0 0 0.6rem;
+		font-size: 0.85rem;
+		opacity: 0.55;
 	}
 	.empty-msg {
 		opacity: 0.5;
 		font-style: italic;
+		font-size: 0.9rem;
 	}
 	.user-detail.empty {
 		display: flex;
@@ -278,7 +320,49 @@
 		opacity: 0.4;
 	}
 
-	/* ---- Exercise table ---- */
+	/* ── Group chips ── */
+	.group-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.group-chip {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.4rem 0.9rem;
+		border-radius: 20px;
+		border: 1.5px solid rgba(255, 255, 255, 0.25);
+		background: rgba(255, 255, 255, 0.07);
+		color: rgba(255, 255, 255, 0.65);
+		font-size: 0.9rem;
+		cursor: pointer;
+		user-select: none;
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			color 0.15s;
+	}
+	.group-chip input[type='checkbox'] {
+		/* hide the native checkbox; the chip style shows state */
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+	.group-chip.active {
+		background: rgba(105, 179, 76, 0.3);
+		border-color: #69b34c;
+		color: white;
+		font-weight: 600;
+	}
+	.group-chip:hover {
+		border-color: rgba(255, 255, 255, 0.5);
+		color: white;
+	}
+
+	/* ── Exercise table ── */
 	.exercise-table {
 		width: 100%;
 		border-collapse: collapse;
@@ -324,7 +408,7 @@
 		color: #ff5050;
 	}
 
-	/* ---- Add row ---- */
+	/* ── Add row ── */
 	.add-row {
 		display: flex;
 		align-items: center;
@@ -361,12 +445,12 @@
 		cursor: default;
 	}
 
-	/* ---- Save ---- */
+	/* ── Save ── */
 	.save-row {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		margin-top: 1.25rem;
+		margin-top: 1.5rem;
 	}
 	.save-btn {
 		padding: 0.55rem 2rem;

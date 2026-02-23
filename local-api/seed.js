@@ -407,11 +407,22 @@ const users = [
   },
 ];
 
+// Derive groupExercises join table from the embedded groups on each exercise
+const groupExercises = exercises.flatMap((ex) =>
+  ex.groups.map((g) => ({
+    id: randomUUID(),
+    groupId: g.id,
+    exerciseId: ex.id,
+    createdAt: now,
+    updatedAt: now,
+  }))
+);
+
 const db = {
   users,
   groups,
   exercises,
-  groupExercises: [],
+  groupExercises,
   userGroups: [],
   stats: [],
   messages: [],
@@ -423,6 +434,7 @@ console.log(`Seeded database at ${DB_PATH}`);
 console.log(`  ${users.length} users`);
 console.log(`  ${groups.length} groups`);
 console.log(`  ${exercises.length} exercises`);
+console.log(`  ${groupExercises.length} groupExercise join rows`);
 
 // Generate placeholder images for local development
 const FILES_DIR = join(__dirname, 'files');
