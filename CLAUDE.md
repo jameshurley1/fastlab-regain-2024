@@ -81,6 +81,30 @@ Always work on the `main` branch. At the start of every session:
 2. Run `git pull origin main`
 Never create or push to a `claude/...` branch unless explicitly asked.
 
+## Merging claude/ Branches into main
+
+**Preferred method — manual merge (safest, avoids GitHub PR pitfalls):**
+
+```bash
+git checkout main
+git pull origin main
+git merge claude/<branch-name>
+git push origin main
+```
+
+**If creating a GitHub Pull Request instead:**
+
+> **WARNING: GitHub defaults the base repository to `michaelcuneo/fastlab-regain-2024` (the upstream original) when opening a PR from this fork. You MUST manually change the base repository to `jameshurley1/fastlab-regain-2024` every time before submitting. Failing to do so will open a PR against the upstream repo, not this fork.**
+
+Steps:
+1. Go to `https://github.com/jameshurley1/fastlab-regain-2024/compare`
+2. Set **base repository** to `jameshurley1/fastlab-regain-2024` (change it — GitHub will pre-fill the upstream)
+3. Set **base branch** to `main`
+4. Set **compare branch** to the `claude/...` branch
+5. Open the PR and merge
+
+The manual merge method above is preferred to avoid this confusion entirely.
+
 ## Session Startup
 At the start of every session, before doing anything else, automatically run:
 git checkout main
