@@ -7,6 +7,12 @@
 
 	import { interaction, pain, difficult, isHalfway, isCompleted, isPaused } from '$lib/utils/store';
 
+	// Clear stale session state so persisted values from a previous exercise
+	// page visit don't trigger messages immediately on load. Runs synchronously
+	// before any $effect callbacks.
+	isPaused.current = false;
+	interaction.current = null;
+
 	const addPauseMessage = () => {
 		interaction.current = [
 			{
