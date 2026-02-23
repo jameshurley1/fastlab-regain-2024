@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, existsSync, createReadStream, statSync } f
 import { randomUUID, createHmac } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname } from 'node:path';
+import { exec } from 'node:child_process';
 
 // Simple JWT implementation for local dev (no jsonwebtoken dependency needed)
 const JWT_SECRET = 'local-dev-secret';
@@ -433,6 +434,9 @@ async function handleRequest(req, res) {
     const token = createJwt({ userId, email, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 180 });
     const callbackUrl = `http://localhost:3000/auth/callback?token=${token}`;
     console.log(`\n  Magic link for ${email}:\n  ${callbackUrl}\n`);
+    if (process.env.LOCAL_DEV === 'true') {
+      exec(`open "${callbackUrl}"`);
+    }
     return json(res, { message: 'Magic link logged to console', callbackUrl });
   }
 
