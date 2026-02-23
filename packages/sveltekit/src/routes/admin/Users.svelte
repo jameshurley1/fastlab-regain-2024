@@ -259,7 +259,7 @@
 	.user-list h3 {
 		margin: 0 0 0.75rem;
 		font-size: 1rem;
-		opacity: 0.7;
+		color: rgba(255, 255, 255, 0.7);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
@@ -297,11 +297,12 @@
 	.user-detail h3 {
 		margin: 0 0 0.25rem;
 		font-size: 1.3rem;
+		color: white;
 	}
 	.user-detail h4 {
 		margin: 1.25rem 0 0.4rem;
 		font-size: 1rem;
-		opacity: 0.85;
+		color: rgba(255, 255, 255, 0.85);
 	}
 	.section-hint {
 		margin: 0 0 0.6rem;
