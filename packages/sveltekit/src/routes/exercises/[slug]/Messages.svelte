@@ -119,10 +119,6 @@
 		];
 
 		isCompleted.current = false;
-
-		setTimeout(() => {
-			goto('/exercises');
-		}, 4000);
 	};
 
 	const handleRemoveMessage = () => {
