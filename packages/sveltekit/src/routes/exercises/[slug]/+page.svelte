@@ -26,12 +26,14 @@
 	let videoCompleted: boolean = $state(false);
 	let showPostVideoButtons: boolean = $state(false);
 	let showRepCounter: boolean = $state(false);
+	let playCount: number = $state(0);
 
 	let { data }: { data: PageData } = $props();
 
 	$effect(() => {
 		if (videoElement) {
 			videoElement.addEventListener('ended', () => {
+				playCount += 1;
 				videoCompleted = true;
 				showPostVideoButtons = true;
 			});
@@ -145,6 +147,7 @@
 					<RepCounter
 						exerciseId={data?.exercises?.id}
 						targetReps={data?.targetReps ?? 10}
+						defaultReps={playCount}
 						{videoCompleted}
 					/>
 				</div>
