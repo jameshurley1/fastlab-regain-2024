@@ -24,14 +24,32 @@
 	let videoElement: HTMLVideoElement | undefined = $state();
 	let action: { success: boolean; key: string } = $state({ success: false, key: '' });
 	let videoCompleted: boolean = $state(false);
+	let showPostVideoButtons: boolean = $state(false);
+	let showRepCounter: boolean = $state(false);
 
 	let { data }: { data: PageData } = $props();
 
 	$effect(() => {
 		if (videoElement) {
-			videoElement.addEventListener('ended', () => { videoCompleted = true; });
+			videoElement.addEventListener('ended', () => {
+				videoCompleted = true;
+				showPostVideoButtons = true;
+			});
 		}
 	});
+
+	function playAgain() {
+		if (!videoElement) return;
+		videoCompleted = false;
+		showPostVideoButtons = false;
+		videoElement.currentTime = 0;
+		videoElement.play();
+	}
+
+	function finishedForNow() {
+		showPostVideoButtons = false;
+		showRepCounter = true;
+	}
 </script>
 
 <form
@@ -67,22 +85,34 @@
 <div class="exercise">
 	<LayoutGrid>
 		<Cell span={8}>
-			<div
-				use:lazyLoad
-				onisVisible={() => {
-					form?.requestSubmit();
-				}}
-			>
-				{#if action.success === true && notfound === false}
-					<Video bind:videoElement src={action.key} width="100%" height="100%" autoplay />
-				{:else if notfound || loaded}
-					<div class="placeholder">
-						<i class="material-icons" style="font-size: 64px;">videocam_off</i>
-						<p>Video not available locally</p>
-						<p class="hint">Place video files in local-api/files/ to view them</p>
+			<div class="video-wrapper">
+				<div
+					use:lazyLoad
+					onisVisible={() => {
+						form?.requestSubmit();
+					}}
+				>
+					{#if action.success === true && notfound === false}
+						<Video bind:videoElement src={action.key} width="100%" height="100%" autoplay />
+					{:else if notfound || loaded}
+						<div class="placeholder">
+							<i class="material-icons" style="font-size: 64px;">videocam_off</i>
+							<p>Video not available locally</p>
+							<p class="hint">Place video files in local-api/files/ to view them</p>
+						</div>
+					{:else}
+						<div class="loader"></div>
+					{/if}
+				</div>
+				{#if showPostVideoButtons}
+					<div class="post-video-overlay">
+						<button class="post-video-btn post-video-btn--replay" onclick={playAgain}>
+							<i class="material-icons">replay</i> Play Again
+						</button>
+						<button class="post-video-btn post-video-btn--done" onclick={finishedForNow}>
+							<i class="material-icons">check</i> Finished for now
+						</button>
 					</div>
-				{:else}
-					<div class="loader"></div>
 				{/if}
 			</div>
 		</Cell>
@@ -110,13 +140,15 @@
 					<Guage video={data?.exercises} type={pain.current ? 'pain' : 'difficult'} />
 				</div>
 			{/if}
-			<div class="guage">
-				<RepCounter
-					exerciseId={data?.exercises?.id}
-					targetReps={data?.targetReps ?? 10}
-					{videoCompleted}
-				/>
-			</div>
+			{#if showRepCounter}
+				<div class="guage">
+					<RepCounter
+						exerciseId={data?.exercises?.id}
+						targetReps={data?.targetReps ?? 10}
+						{videoCompleted}
+					/>
+				</div>
+			{/if}
 		</Cell>
 	</LayoutGrid>
 	<Messages />
@@ -134,6 +166,41 @@
 	}
 	.guage {
 		margin-top: 1em;
+	}
+	.video-wrapper {
+		position: relative;
+	}
+	.post-video-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		background: rgba(0, 0, 0, 0.6);
+		border-radius: 16px;
+	}
+	.post-video-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.75rem 2rem;
+		min-width: 200px;
+		border-radius: 8px;
+		border: none;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.post-video-btn--replay {
+		background: white;
+		color: #333;
+	}
+	.post-video-btn--done {
+		background: #69b34c;
+		color: white;
 	}
 	.placeholder {
 		display: flex;
