@@ -376,6 +376,9 @@ const exercises = [
   },
 ];
 
+// exercises indices for reference:
+// HEAD: 0 = Neck Stretch
+// ARMS: 18 = Arm to Front, 19 = Arm to Side, 22 = Elbow Stretch
 const users = [
   {
     id: randomUUID(),
@@ -383,7 +386,12 @@ const users = [
     onboard: true,
     overallProgress: 25,
     groups: [groups[0], groups[2]],
-    exercises: [],
+    exercises: [
+      { exerciseId: exercises[0].id, targetReps: 10 },  // Neck Stretch
+      { exerciseId: exercises[18].id, targetReps: 12 }, // Arm to Front
+      { exerciseId: exercises[19].id, targetReps: 12 }, // Arm to Side
+      { exerciseId: exercises[22].id, targetReps: 8 },  // Elbow Stretch
+    ],
     createdAt: now,
     updatedAt: now,
   },

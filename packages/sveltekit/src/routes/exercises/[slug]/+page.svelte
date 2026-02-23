@@ -15,6 +15,7 @@
 	import Messages from './Messages.svelte';
 	import Controls from './Controls.svelte';
 	import Guage from './Guage.svelte';
+	import RepCounter from './RepCounter.svelte';
 
 	let loaded: boolean = $state(false);
 	let notfound: boolean = $state(false);
@@ -22,8 +23,15 @@
 	let form: HTMLFormElement | undefined = $state();
 	let videoElement: HTMLVideoElement | undefined = $state();
 	let action: { success: boolean; key: string } = $state({ success: false, key: '' });
+	let videoCompleted: boolean = $state(false);
 
 	let { data }: { data: PageData } = $props();
+
+	$effect(() => {
+		if (videoElement) {
+			videoElement.addEventListener('ended', () => { videoCompleted = true; });
+		}
+	});
 </script>
 
 <form
@@ -102,6 +110,13 @@
 					<Guage video={data?.exercises} type={pain.current ? 'pain' : 'difficult'} />
 				</div>
 			{/if}
+			<div class="guage">
+				<RepCounter
+					exerciseId={data?.exercises?.id}
+					targetReps={data?.targetReps ?? 10}
+					{videoCompleted}
+				/>
+			</div>
 		</Cell>
 	</LayoutGrid>
 	<Messages />

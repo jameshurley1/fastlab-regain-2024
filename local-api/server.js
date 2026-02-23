@@ -342,6 +342,15 @@ async function handleRequest(req, res) {
     saveDb(db);
     return json(res, { message: 'User deleted' });
   }
+  if (method === 'PUT' && pathname === '/user/updateExerciseTargets') {
+    const body = await parseBody(req);
+    const idx = db.users.findIndex((u) => u.email === body.email);
+    if (idx === -1) return json(res, "Error: User doesn't exist", 500);
+    db.users[idx].exercises = body.exercises;
+    db.users[idx].updatedAt = new Date().toISOString();
+    saveDb(db);
+    return json(res, db.users[idx]);
+  }
 
   // =====================
   // USER GROUP ENDPOINTS
@@ -382,6 +391,9 @@ async function handleRequest(req, res) {
   // =====================
   if (method === 'GET' && pathname === '/session/list') {
     return json(res, db.sessions);
+  }
+  if (method === 'GET' && (params = match('/session/listByUser/{userId}', pathname))) {
+    return json(res, db.sessions.filter((s) => s.userId === params.userId));
   }
   if (method === 'GET' && (params = match('/session/get/{id}', pathname))) {
     const item = db.sessions.find((s) => s.id === params.id);

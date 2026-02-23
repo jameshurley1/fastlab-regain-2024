@@ -7,13 +7,18 @@ type Mailer = {
   password: string;
 };
 
+type UserExercise = {
+  exerciseId: string;
+  targetReps: number;
+};
+
 type User = {
   id: string;
   email: string;
   onboard: boolean;
   overallProgress: number;
   groups: Group[];
-  exercises: Exercise[];
+  exercises: UserExercise[];
   createdAt: string;
   updatedAt: string;
 };
@@ -87,6 +92,10 @@ type Error = {
 type Session = {
   id: string;
   userId: string;
+  exerciseId: string;
+  repsCompleted: number;
+  videoCompleted: boolean;
+  date: string;
 };
 
 type Information = {
