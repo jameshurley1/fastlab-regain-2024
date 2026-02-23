@@ -4,6 +4,7 @@
 	let time: number = $state(0);
 	let duration: number = $state(0);
 	let paused: boolean = $state(false);
+	let hasPlayed: boolean = $state(false);
 	let showControls: boolean = true;
 	let showControlsTimeout: any;
 	let lastMouseDown: any;
@@ -40,13 +41,17 @@
 	};
 
 	$effect(() => {
+		if (!paused) hasPlayed = true;
+	});
+
+	$effect(() => {
 		if (time > duration / 2) {
 			isHalfway.current = true;
 		}
 		if (Math.round(time) == Math.round(duration)) {
 			isCompleted.current = true;
 		}
-		paused ? (isPaused.current = true) : (isPaused.current = false);
+		isPaused.current = paused && hasPlayed;
 	});
 
 	let {
