@@ -25,8 +25,8 @@
 	let action: { success: boolean; key: string } = $state({ success: false, key: '' });
 	let videoCompleted: boolean = $state(false);
 	let showPostVideoButtons: boolean = $state(false);
-	let showRepCounter: boolean = $state(false);
 	let playCount: number = $state(0);
+	let reps: number = $state(0);
 
 	let { data }: { data: PageData } = $props();
 
@@ -34,6 +34,7 @@
 		if (videoElement) {
 			videoElement.addEventListener('ended', () => {
 				playCount += 1;
+				reps += 1;
 				videoCompleted = true;
 				showPostVideoButtons = true;
 			});
@@ -50,7 +51,6 @@
 
 	function finishedForNow() {
 		showPostVideoButtons = false;
-		showRepCounter = true;
 	}
 </script>
 
@@ -142,16 +142,14 @@
 					<Guage video={data?.exercises} type={pain.current ? 'pain' : 'difficult'} />
 				</div>
 			{/if}
-			{#if showRepCounter}
-				<div class="guage">
-					<RepCounter
-						exerciseId={data?.exercises?.id}
-						targetReps={data?.targetReps ?? 10}
-						defaultReps={playCount}
-						{videoCompleted}
-					/>
-				</div>
-			{/if}
+			<div class="guage">
+				<RepCounter
+					exerciseId={data?.exercises?.id}
+					targetReps={data?.targetReps ?? 10}
+					bind:reps
+					{videoCompleted}
+				/>
+			</div>
 		</Cell>
 	</LayoutGrid>
 	<Messages />

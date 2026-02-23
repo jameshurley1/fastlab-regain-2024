@@ -7,16 +7,14 @@
 	let {
 		exerciseId,
 		targetReps = 10,
-		defaultReps = 0,
+		reps = $bindable(0),
 		videoCompleted = false
 	}: {
 		exerciseId: string;
 		targetReps?: number;
-		defaultReps?: number;
+		reps?: number;
 		videoCompleted?: boolean;
 	} = $props();
-
-	let reps = $state(defaultReps);
 	let submitted = $state(false);
 	let submitting = $state(false);
 
