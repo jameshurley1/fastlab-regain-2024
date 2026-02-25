@@ -7,7 +7,7 @@
 	import Users from './Users.svelte';
 
 	let open = $state(true);
-	let active = $state('Groups');
+	let active = $state('Users');
 
 	function setActive(value: string) {
 		active = value;
