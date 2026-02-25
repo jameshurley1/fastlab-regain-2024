@@ -6,6 +6,7 @@
 	let users: User[] = $state([]);
 	let allExercises: (Exercise & { groups?: { id: string; area: string }[] })[] = $state([]);
 	let allGroups: Group[] = $state([]);
+	let allSessions: any[] = $state([]);
 
 	let selectedUser: User | null = $state(null);
 	// Working copies — edited locally, saved together in one call
@@ -14,16 +15,19 @@
 
 	let saving = $state(false);
 	let saveMsg = $state('');
+	let expandProgress = $state(false);
 
 	onMount(async () => {
-		const [usersRes, exRes, groupsRes] = await Promise.all([
+		const [usersRes, exRes, groupsRes, sessionsRes] = await Promise.all([
 			fetch(`${API}/user/list`),
 			fetch(`${API}/exercise/list`),
-			fetch(`${API}/group/list`)
+			fetch(`${API}/group/list`),
+			fetch(`${API}/session/list`)
 		]);
 		users = await usersRes.json();
 		allExercises = await exRes.json();
 		allGroups = await groupsRes.json();
+		allSessions = await sessionsRes.json();
 	});
 
 	function selectUser(u: User) {
@@ -31,6 +35,7 @@
 		draftGroups = (u.groups ?? []).map((g) => ({ ...g }));
 		draftExercises = (u.exercises ?? []).map((e) => ({ ...e }));
 		saveMsg = '';
+		expandProgress = false;
 	}
 
 	// Toggle a body-area group in/out of draftGroups
@@ -111,6 +116,23 @@
 
 	function exerciseTitle(id: string): string {
 		return allExercises.find((e) => e.id === id)?.title ?? id;
+	}
+
+	function userSessions(userId: string): any[] {
+		return allSessions.filter((s) => s.userId === userId);
+	}
+
+	function lastSession(sessions: any[]): any | null {
+		if (!sessions.length) return null;
+		return sessions.reduce((a, b) => (a.date > b.date ? a : b));
+	}
+
+	function formatDate(iso: string): string {
+		return new Date(iso).toLocaleDateString('en-AU', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		});
 	}
 
 	let addSelectValue = $state('');
@@ -231,6 +253,49 @@
 					<span class="save-msg" class:error={saveMsg === 'Save failed.'}>{saveMsg}</span>
 				{/if}
 			</div>
+
+			<!-- ── Session progress ── -->
+			<h4 style="margin-top: 1.75rem;">Session Progress</h4>
+			{@const sessions = userSessions(selectedUser.id)}
+			{@const last = lastSession(sessions)}
+			{#if sessions.length}
+				<p class="session-summary">
+					Last session: {formatDate(last.date)} · Total sessions: {sessions.length}
+				</p>
+			{:else}
+				<p class="session-summary no-sessions-text">No sessions yet</p>
+			{/if}
+			<button class="toggle-btn" onclick={() => (expandProgress = !expandProgress)}>
+				{expandProgress ? 'Hide Progress ▲' : 'View Progress ▼'}
+			</button>
+			{#if expandProgress}
+				<div class="session-table-wrap">
+					{#if sessions.length}
+						<table class="session-hist-table">
+							<thead>
+								<tr>
+									<th>Exercise</th>
+									<th>Date</th>
+									<th>Reps</th>
+									<th>Video</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each sessions.slice().sort((a: any, b: any) => b.date.localeCompare(a.date)) as s}
+									<tr>
+										<td>{exerciseTitle(s.exerciseId)}</td>
+										<td>{formatDate(s.date)}</td>
+										<td>{s.repsCompleted}</td>
+										<td>{s.videoCompleted ? '✓' : '—'}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					{:else}
+						<p class="empty-msg">No sessions recorded.</p>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	{:else}
 		<div class="user-detail empty">
@@ -473,5 +538,52 @@
 	}
 	.save-msg.error {
 		color: #ff5050;
+	}
+
+	/* ── Session progress ── */
+	.session-summary {
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0.25rem 0 0.5rem;
+	}
+	.no-sessions-text {
+		color: rgba(255, 255, 255, 0.35);
+		font-style: italic;
+	}
+	.toggle-btn {
+		background: none;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		border-radius: 6px;
+		padding: 0.3rem 0.75rem;
+		font-size: 0.8rem;
+		cursor: pointer;
+		color: rgba(255, 255, 255, 0.75);
+		margin-bottom: 0.5rem;
+	}
+	.toggle-btn:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.45);
+		color: white;
+	}
+	.session-table-wrap {
+		margin-top: 0.5rem;
+		overflow-x: auto;
+	}
+	.session-hist-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.875rem;
+	}
+	.session-hist-table th {
+		text-align: left;
+		padding: 0.4rem 0.6rem;
+		opacity: 0.6;
+		font-weight: 500;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	}
+	.session-hist-table td {
+		padding: 0.35rem 0.6rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.85);
 	}
 </style>
