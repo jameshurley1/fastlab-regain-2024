@@ -135,6 +135,11 @@
 		});
 	}
 
+	const selectedUserSessions = $derived(
+		selectedUser ? userSessions(selectedUser.id) : []
+	);
+	const selectedUserLastSession = $derived(lastSession(selectedUserSessions));
+
 	let addSelectValue = $state('');
 </script>
 
@@ -256,11 +261,9 @@
 
 			<!-- ── Session progress ── -->
 			<h4 style="margin-top: 1.75rem;">Session Progress</h4>
-			{@const sessions = userSessions(selectedUser.id)}
-			{@const last = lastSession(sessions)}
-			{#if sessions.length}
+			{#if selectedUserSessions.length}
 				<p class="session-summary">
-					Last session: {formatDate(last.date)} · Total sessions: {sessions.length}
+					Last session: {formatDate(selectedUserLastSession.date)} · Total sessions: {selectedUserSessions.length}
 				</p>
 			{:else}
 				<p class="session-summary no-sessions-text">No sessions yet</p>
@@ -270,7 +273,7 @@
 			</button>
 			{#if expandProgress}
 				<div class="session-table-wrap">
-					{#if sessions.length}
+					{#if selectedUserSessions.length}
 						<table class="session-hist-table">
 							<thead>
 								<tr>
@@ -281,7 +284,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each sessions.slice().sort((a: any, b: any) => b.date.localeCompare(a.date)) as s}
+								{#each selectedUserSessions.slice().sort((a: any, b: any) => b.date.localeCompare(a.date)) as s}
 									<tr>
 										<td>{exerciseTitle(s.exerciseId)}</td>
 										<td>{formatDate(s.date)}</td>
