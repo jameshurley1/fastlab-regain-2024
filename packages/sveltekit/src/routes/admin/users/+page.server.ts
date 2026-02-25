@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
 
 export const load = (async () => {
-	const usersUrl = Api.regainApi.url + '/user/list';
+	const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
+	const usersUrl = apiUrl + '/user/list';
 	const usersResponse = await fetch(usersUrl);
 	const users = await usersResponse.json();
 

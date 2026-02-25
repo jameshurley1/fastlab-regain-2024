@@ -1,9 +1,8 @@
 import type { Actions, PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
+
+const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
 
 export const load: PageServerLoad = (async ({ params, locals }) => {
-	const apiUrl = Api.regainApi.url;
-
 	// Fetch the exercise
 	const exerciseResponse = await fetch(`${apiUrl}/exercise/get/${params.slug}`);
 	const exercise = await exerciseResponse.json();
@@ -30,7 +29,7 @@ export const actions = {
 	async getKey({ request }: { request: Request }) {
 		const formData = await request.formData();
 		const key = formData.get('key')?.toString() || undefined;
-		const keyUrl = `${Api.regainApi.url}/presignedurl/${key}`;
+		const keyUrl = `${apiUrl}/presignedurl/${key}`;
 		const keyResponse = await fetch(keyUrl);
 		return keyResponse.json();
 	},
@@ -42,7 +41,7 @@ export const actions = {
 		const videoCompleted = formData.get('videoCompleted') === 'true';
 		const userId = locals.session?.userId || '';
 
-		await fetch(`${Api.regainApi.url}/session/create`, {
+		await fetch(`${apiUrl}/session/create`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

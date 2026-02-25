@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { redirect } from '@sveltejs/kit';
 import { SESSION_COOKIE_NAME } from '$lib/utils/constants.js';
 import { createSessionForUser } from '$lib/utils/auth.js';
-import { Api } from 'sst/node/api'
+
 
 type UserToken = {
 	userId: string;
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	});
 
 	// Return the user id and email
-	const getUserURL = `${Api.regainApi.url}/user/getUserByEmail/${decodedUser.email}`;
+	const getUserURL = `${process.env.LOCAL_API_URL ?? 'http://localhost:3001'}/user/getUserByEmail/${decodedUser.email}`;
 	const userResponse = await fetch(getUserURL);
 
 	if (!userResponse.ok) {

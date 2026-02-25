@@ -1,8 +1,6 @@
 import type { Actions } from './$types';
 import { randomUUID } from 'crypto';
-import { Api } from 'sst/node/api';
-
-const API_URL = Api.regainApi.url;
+const API_URL = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
 
 export const actions = {
   async magicLinks({ request }: { request: Request }) {

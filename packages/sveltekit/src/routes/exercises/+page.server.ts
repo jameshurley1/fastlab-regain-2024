@@ -1,9 +1,9 @@
 import type { Actions, PageServerLoad } from './$types';
-import { Api } from 'sst/node/api';
 
 export const load = (async () => {
+	const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
 	// Fetch all exercises.
-	const exerciseUrl = Api.regainApi.url + '/exercise/list';
+	const exerciseUrl = apiUrl + '/exercise/list';
 	const exerciseResponse = await fetch(exerciseUrl);
 	const exercises = await exerciseResponse.json();
 
@@ -16,7 +16,7 @@ export const actions = {
 	async getKey({ request }: { request: Request }) {
 		const formData = await request.formData();
 		const key = formData.get('key')?.toString() || undefined;
-		const keyUrl = Api.regainApi.url + '/presignedurl/' + key;
+		const keyUrl = (process.env.LOCAL_API_URL ?? 'http://localhost:3001') + '/presignedurl/' + key;
 		const keyResponse = await fetch(keyUrl);
 
 		return keyResponse.json();
