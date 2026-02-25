@@ -7,7 +7,7 @@
 	import Card, { Content, Actions } from '@smui/card';
 	import Button, { Label } from '@smui/button';
 
-	import { difficult, pain } from '$lib/utils/store';
+	import { isPaused, difficult, pain } from '$lib/utils/store';
 	import { lazyLoad } from '$lib/utils/lazyload';
 	import { calculateRealTime } from '$lib/utils/calculateRealTime';
 	import Video from '$lib/components/Video.svelte';
@@ -36,6 +36,7 @@
 				playCount += 1;
 				reps += 1;
 				videoCompleted = true;
+				isPaused.current = false;
 				showPostVideoButtons = true;
 			});
 		}

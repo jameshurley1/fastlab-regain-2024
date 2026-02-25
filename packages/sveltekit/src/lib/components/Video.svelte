@@ -51,7 +51,7 @@
 		if (Math.round(time) == Math.round(duration)) {
 			isCompleted.current = true;
 		}
-		isPaused.current = paused && hasPlayed;
+		isPaused.current = paused && hasPlayed && !videoElement?.ended;
 	});
 
 	let {
