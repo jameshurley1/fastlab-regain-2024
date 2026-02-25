@@ -63,4 +63,16 @@ export const actions = {
       }
     }
   }
+  async savePatientAreas({ request }) {
+    const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
+    const formData = await request.formData();
+    const email = formData.get('email')?.toString() || '';
+    const patientAreas = JSON.parse(formData.get('patientAreas')?.toString() || '[]');
+    await fetch(`${apiUrl}/user/update`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, patientAreas })
+    });
+    return { success: true };
+  }
 } satisfies Actions;
