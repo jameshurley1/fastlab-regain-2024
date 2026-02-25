@@ -62,7 +62,7 @@ export const actions = {
         error: err
       }
     }
-  }
+  },
   async savePatientAreas({ request }) {
     const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
     const formData = await request.formData();
