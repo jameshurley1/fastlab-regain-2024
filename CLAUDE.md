@@ -109,3 +109,13 @@ The manual merge method above is preferred to avoid this confusion entirely.
 At the start of every session, before doing anything else, automatically run:
 git checkout main
 git pull origin main
+
+## End of Session Workflow
+
+At the end of every session, remind James to run the sync script from his terminal:
+
+```
+./sync-from-claude.sh
+```
+
+This fetches the Claude Code branch, merges it into local main, and pushes to origin/main. James must run this from his own terminal — Claude Code cannot push directly to origin/main.
