@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
-	import { user, activeAreas } from '$lib/utils/store';
+	import { user } from '$lib/utils/store';
 
 	const API = 'http://127.0.0.1:3001';
 
@@ -22,11 +22,6 @@
 		loading = false;
 	});
 
-	// Active body areas (those with status: true in the store)
-	const activeAreaNames = $derived(
-		activeAreas.current.filter((a) => a.status).map((a) => a.name)
-	);
-
 	// The user's exercise assignments: [{ exerciseId, targetReps }]
 	const userAssignments = $derived(user.current?.exercises ?? []);
 
@@ -38,7 +33,8 @@
 		return relevant[0]?.repsCompleted ?? 0;
 	}
 
-	// Group assignments by body area, filtered to active areas only
+	// Group assignments by body area, derived from the exercises' own group memberships.
+	// Only areas that have at least one assigned exercise will appear.
 	type BarData = {
 		exerciseId: string;
 		title: string;
@@ -51,41 +47,22 @@
 	};
 
 	const areaGroups = $derived.by((): AreaGroup[] => {
-		const result: AreaGroup[] = [];
-
-		for (const areaName of activeAreaNames) {
-			const bars: BarData[] = [];
-			for (const assignment of userAssignments) {
-				const ex = allExercises.find((e) => e.id === assignment.exerciseId);
-				if (!ex) continue;
-				const inArea = (ex.groups ?? []).some((g) => g.area === areaName);
-				if (!inArea) continue;
-				bars.push({
-					exerciseId: assignment.exerciseId,
-					title: ex.title,
-					targetReps: assignment.targetReps,
-					repsCompleted: latestReps(assignment.exerciseId)
-				});
-			}
-			if (bars.length > 0) {
-				result.push({ area: areaName, bars });
-			}
-		}
-
-		return result;
-	});
-
-	// If no areas are active yet, fall back to showing all assigned exercises flat
-	const fallbackBars = $derived.by((): BarData[] => {
-		return userAssignments.map((assignment) => {
+		const map = new Map<string, BarData[]>();
+		for (const assignment of userAssignments) {
 			const ex = allExercises.find((e) => e.id === assignment.exerciseId);
-			return {
+			if (!ex) continue;
+			const bar: BarData = {
 				exerciseId: assignment.exerciseId,
-				title: ex?.title ?? assignment.exerciseId,
+				title: ex.title,
 				targetReps: assignment.targetReps,
 				repsCompleted: latestReps(assignment.exerciseId)
 			};
-		});
+			for (const g of ex.groups ?? []) {
+				if (!map.has(g.area)) map.set(g.area, []);
+				map.get(g.area)!.push(bar);
+			}
+		}
+		return Array.from(map, ([area, bars]) => ({ area, bars }));
 	});
 
 	function barPercent(reps: number, target: number): number {
@@ -106,7 +83,7 @@
 			<div class="spinner"></div>
 			<p>Loading progress…</p>
 		</div>
-	{:else if activeAreaNames.length === 0 && fallbackBars.length === 0}
+	{:else if areaGroups.length === 0}
 		<div class="empty-state">
 			<i class="material-icons" style="font-size: 3rem; opacity: 0.4;">bar_chart</i>
 			<p>No exercises assigned yet.</p>
@@ -114,12 +91,11 @@
 		</div>
 	{:else}
 		<LayoutGrid>
-			{#if activeAreaNames.length === 0}
-				<!-- No areas selected — show all assignments flat -->
-				<Cell span={12}>
+			{#each areaGroups as group}
+				<Cell span={6}>
 					<div class="area-card">
-						<h3 class="area-heading">All exercises</h3>
-						{#each fallbackBars as bar}
+						<h3 class="area-heading">{group.area}</h3>
+						{#each group.bars as bar}
 							{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
 							<div class="bar-row">
 								<div class="bar-label">
@@ -137,39 +113,7 @@
 						{/each}
 					</div>
 				</Cell>
-			{:else}
-				{#each areaGroups as group}
-					<Cell span={6}>
-						<div class="area-card">
-							<h3 class="area-heading">{group.area}</h3>
-							{#each group.bars as bar}
-								{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
-								<div class="bar-row">
-									<div class="bar-label">
-										<span class="ex-title">{bar.title}</span>
-										<span class="rep-fraction">{bar.repsCompleted} / {bar.targetReps}</span>
-									</div>
-									<div class="bar-track">
-										<div
-											class="bar-fill"
-											style="width: {pct}%; background: {barColor(pct)};"
-										></div>
-									</div>
-									<span class="pct-label">{pct}%</span>
-								</div>
-							{/each}
-						</div>
-					</Cell>
-				{/each}
-				{#if areaGroups.length === 0}
-					<Cell span={12}>
-						<div class="empty-state">
-							<i class="material-icons" style="font-size: 3rem; opacity: 0.4;">fitness_center</i>
-							<p>No exercises assigned in the selected body areas.</p>
-						</div>
-					</Cell>
-				{/if}
-			{/if}
+			{/each}
 		</LayoutGrid>
 	{/if}
 </div>
@@ -230,12 +174,12 @@
 	.area-card {
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 12px;
-		padding: 1.25rem 1.5rem;
+		padding: 1.5rem 1.75rem;
 		margin-bottom: 0.5rem;
 	}
 	.area-heading {
-		margin: 0 0 1rem;
-		font-size: 1.1rem;
+		margin: 0 0 1.25rem;
+		font-size: 1.2rem;
 		font-weight: 700;
 		color: white;
 		text-transform: uppercase;
@@ -248,8 +192,8 @@
 		display: grid;
 		grid-template-columns: 1fr auto;
 		grid-template-rows: auto auto;
-		gap: 0.2rem 0.75rem;
-		margin-bottom: 0.9rem;
+		gap: 0.3rem 0.75rem;
+		margin-bottom: 1.5rem;
 		align-items: center;
 	}
 	.bar-label {
@@ -260,31 +204,31 @@
 		color: white;
 	}
 	.ex-title {
-		font-size: 0.95rem;
+		font-size: 1.1rem;
 		font-weight: 500;
 	}
 	.rep-fraction {
-		font-size: 0.82rem;
+		font-size: 0.95rem;
 		opacity: 0.65;
 		margin-left: 0.5rem;
 	}
 	.bar-track {
 		grid-column: 1;
-		height: 18px;
+		height: 22px;
 		background: rgba(255, 255, 255, 0.15);
-		border-radius: 9px;
+		border-radius: 11px;
 		overflow: hidden;
 	}
 	.bar-fill {
 		height: 100%;
-		border-radius: 9px;
+		border-radius: 11px;
 		transition: width 0.4s ease;
 		min-width: 0;
 	}
 	.pct-label {
 		grid-column: 2;
 		grid-row: 2;
-		font-size: 0.82rem;
+		font-size: 0.95rem;
 		color: rgba(255, 255, 255, 0.65);
 		white-space: nowrap;
 		text-align: right;
