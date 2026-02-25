@@ -127,11 +127,14 @@
 		return sessions.reduce((a, b) => (a.date > b.date ? a : b));
 	}
 
-	function formatDate(iso: string): string {
+	function formatDate(iso: string) {
 		return new Date(iso).toLocaleDateString('en-AU', {
 			day: 'numeric',
 			month: 'short',
-			year: 'numeric'
+			year: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
 		});
 	}
 
