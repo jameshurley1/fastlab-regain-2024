@@ -1,26 +1,19 @@
 <script lang="ts">
 	import LayoutGrid from '@smui/layout-grid';
 	import Exercise from './Exercise.svelte';
-	import { activeAreas } from '$lib/utils/store';
+	import { user } from '$lib/utils/store';
 
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
+	// Show only the exercises the clinician has assigned to this patient.
 	let filteredExercises = $derived.by(() => {
-		const selectedAreaNames = activeAreas.current
-			.filter((area: Area) => area.status)
-			.map((area: Area) => area.name);
-
-		if (selectedAreaNames.length === 0) {
-			return data.exercises;
-		}
-
-		return data.exercises.filter((exercise: Exercise) =>
-			exercise.groups?.some((group: { area: string }) =>
-				selectedAreaNames.includes(group.area)
-			)
+		const assignedIds = new Set(
+			(user.current?.exercises ?? []).map((e: { exerciseId: string }) => e.exerciseId)
 		);
+		if (assignedIds.size === 0) return data.exercises;
+		return data.exercises.filter((exercise: Exercise) => assignedIds.has(exercise.id));
 	});
 </script>
 

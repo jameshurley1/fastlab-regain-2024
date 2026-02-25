@@ -48,18 +48,23 @@
 
 	const areaGroups = $derived.by((): AreaGroup[] => {
 		const map = new Map<string, BarData[]>();
+		const seen = new Set<string>();
 		for (const assignment of userAssignments) {
+			if (seen.has(assignment.exerciseId)) continue;
 			const ex = allExercises.find((e) => e.id === assignment.exerciseId);
 			if (!ex) continue;
+			seen.add(assignment.exerciseId);
 			const bar: BarData = {
 				exerciseId: assignment.exerciseId,
 				title: ex.title,
 				targetReps: assignment.targetReps,
 				repsCompleted: latestReps(assignment.exerciseId)
 			};
-			for (const g of ex.groups ?? []) {
-				if (!map.has(g.area)) map.set(g.area, []);
-				map.get(g.area)!.push(bar);
+			// Place the exercise in its primary group only to avoid duplicates.
+			const primaryGroup = (ex.groups ?? [])[0];
+			if (primaryGroup) {
+				if (!map.has(primaryGroup.area)) map.set(primaryGroup.area, []);
+				map.get(primaryGroup.area)!.push(bar);
 			}
 		}
 		return Array.from(map, ([area, bars]) => ({ area, bars }));
