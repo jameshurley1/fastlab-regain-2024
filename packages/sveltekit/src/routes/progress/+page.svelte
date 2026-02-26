@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import { user } from '$lib/utils/store';
 
 	const API = 'http://127.0.0.1:3001';
@@ -129,31 +128,26 @@
 		</div>
 	{:else}
 		{#if areaGroups.length > 0}
-			<LayoutGrid>
+			<div class="cards-grid">
 				{#each areaGroups as group}
-					<Cell span={6}>
-						<div class="area-card">
-							<h3 class="area-heading">{group.area}</h3>
-							{#each group.bars as bar}
-								{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
-								<div class="bar-row">
-									<div class="bar-label">
-										<span class="ex-title">{bar.title}</span>
-										<span class="rep-fraction">{bar.repsCompleted} / {bar.targetReps}</span>
-									</div>
-									<div class="bar-track">
-										<div
-											class="bar-fill"
-											style="width: {pct}%; background: {barColor(pct)};"
-										></div>
-									</div>
-									<span class="pct-label">{pct}%</span>
+					<div class="area-card">
+						<h3 class="area-heading">{group.area}</h3>
+						{#each group.bars as bar}
+							{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
+							<div class="bar-row">
+								<span class="ex-title">{bar.title}</span>
+								<div class="bar-track">
+									<div
+										class="bar-fill"
+										style="width: {pct}%; background: {barColor(pct)};"
+									></div>
 								</div>
-							{/each}
-						</div>
-					</Cell>
+								<span class="meta">{bar.repsCompleted}&thinsp;/&thinsp;{bar.targetReps} · {pct}%</span>
+							</div>
+						{/each}
+					</div>
 				{/each}
-			</LayoutGrid>
+			</div>
 		{/if}
 
 		{#if patientAreaGroups.length > 0}
@@ -161,34 +155,31 @@
 				<h2 class="patient-section-title">Your additions</h2>
 				<span class="patient-section-hint">Areas you selected — no clinician target set</span>
 			</div>
-			<LayoutGrid>
+			<div class="cards-grid">
 				{#each patientAreaGroups as group}
-					<Cell span={6}>
-						<div class="area-card patient-card">
-							<h3 class="area-heading patient-area-heading">
-								{group.area}
-								<span class="patient-label">Your choice</span>
-							</h3>
-							{#each group.bars as bar}
-								{@const pct = patientBarPercent(bar.repsCompleted)}
-								<div class="bar-row">
-									<div class="bar-label">
-										<span class="ex-title">{bar.title}</span>
-										<span class="rep-fraction">{bar.repsCompleted} reps</span>
-									</div>
-									<div class="bar-track">
-										<div
-											class="bar-fill"
-											style="width: {pct}%; background: {barColor(pct)};"
-										></div>
-									</div>
-									<span class="pct-label">{pct > 0 ? `${pct}%` : 'not started'}</span>
+					<div class="area-card patient-card">
+						<h3 class="area-heading patient-area-heading">
+							{group.area}
+							<span class="patient-label">Your choice</span>
+						</h3>
+						{#each group.bars as bar}
+							{@const pct = patientBarPercent(bar.repsCompleted)}
+							<div class="bar-row">
+								<span class="ex-title">{bar.title}</span>
+								<div class="bar-track">
+									<div
+										class="bar-fill"
+										style="width: {pct}%; background: {barColor(pct)};"
+									></div>
 								</div>
-							{/each}
-						</div>
-					</Cell>
+								<span class="meta">
+									{bar.repsCompleted} reps · {pct > 0 ? `${pct}%` : 'not started'}
+								</span>
+							</div>
+						{/each}
+					</div>
 				{/each}
-			</LayoutGrid>
+			</div>
 		{/if}
 	{/if}
 </div>
@@ -245,15 +236,22 @@
 		font-size: 0.9rem;
 	}
 
+	/* 3-column auto-fill grid */
+	.cards-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
 	/* Area card */
 	.area-card {
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 12px;
 		padding: 1.5rem 1.75rem;
-		margin-bottom: 0.5rem;
 	}
 	.area-heading {
-		margin: 0 0 1.25rem;
+		margin: 0 0 1rem;
 		font-size: 1.2rem;
 		font-weight: 700;
 		color: white;
@@ -267,7 +265,7 @@
 		display: flex;
 		align-items: baseline;
 		gap: 1rem;
-		padding: 0.5rem 0.5rem 0;
+		padding: 0.75rem 0.25rem 0.5rem;
 	}
 	.patient-section-title {
 		margin: 0;
@@ -299,50 +297,42 @@
 		opacity: 0.65;
 	}
 
-	/* Bar rows */
+	/* Single-line exercise rows */
 	.bar-row {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		grid-template-rows: auto auto;
-		gap: 0.3rem 0.75rem;
-		margin-bottom: 1.5rem;
-		align-items: center;
-	}
-	.bar-label {
-		grid-column: 1;
 		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		color: white;
+		align-items: center;
+		margin-bottom: 0.65rem;
 	}
 	.ex-title {
-		font-size: 1.1rem;
+		flex: 0 0 35%;
+		max-width: 35%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 0.9rem;
 		font-weight: 500;
-	}
-	.rep-fraction {
-		font-size: 0.95rem;
-		opacity: 0.65;
-		margin-left: 0.5rem;
+		color: white;
+		margin-right: 8px;
 	}
 	.bar-track {
-		grid-column: 1;
-		height: 22px;
+		flex: 1;
+		height: 6px;
+		margin: 0 8px;
 		background: rgba(255, 255, 255, 0.15);
-		border-radius: 11px;
+		border-radius: 3px;
 		overflow: hidden;
 	}
 	.bar-fill {
 		height: 100%;
-		border-radius: 11px;
+		border-radius: 3px;
 		transition: width 0.4s ease;
 		min-width: 0;
 	}
-	.pct-label {
-		grid-column: 2;
-		grid-row: 2;
-		font-size: 0.95rem;
-		color: rgba(255, 255, 255, 0.65);
+	.meta {
+		flex: 0 0 auto;
+		font-size: 0.78rem;
+		color: rgba(255, 255, 255, 0.55);
 		white-space: nowrap;
-		text-align: right;
+		margin-left: 8px;
 	}
 </style>
