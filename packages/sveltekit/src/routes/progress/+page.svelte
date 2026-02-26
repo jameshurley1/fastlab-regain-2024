@@ -307,11 +307,9 @@
 		margin-bottom: 0.65rem;
 	}
 	.ex-title {
-		flex: 0 0 60%;
-		max-width: 60%;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		flex: 0 0 40%;
+		max-width: 40%;
+		white-space: normal;
 		font-size: 0.9rem;
 		font-weight: 500;
 		color: white;
