@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
+	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { isEmpty } from '$lib/utils/isEmpty';
 	import IconButton from '@smui/icon-button';
@@ -92,7 +93,7 @@
 				buttons: []
 			}
 		];
-		isHalfway.current = false;
+		untrack(() => { isHalfway.current = false; });
 	};
 
 	let handleResult = (e: string) => {
