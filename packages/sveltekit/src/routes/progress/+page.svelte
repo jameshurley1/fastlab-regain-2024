@@ -307,8 +307,8 @@
 		margin-bottom: 0.65rem;
 	}
 	.ex-title {
-		flex: 0 0 48%;
-		max-width: 48%;
+		flex: 0 0 60%;
+		max-width: 60%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
