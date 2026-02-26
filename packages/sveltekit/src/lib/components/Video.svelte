@@ -10,7 +10,7 @@
 	});
 
 	$effect(() => {
-		if (time > duration / 2) {
+		if (time > duration / 2 && !isHalfway.current) {
 			isHalfway.current = true;
 		}
 		const newIsPaused = paused && hasPlayed && !videoElement?.ended;
