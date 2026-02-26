@@ -5,15 +5,9 @@
 	let duration: number = $state(0);
 	let paused: boolean = $state(false);
 	let hasPlayed: boolean = $state(false);
-	let showControls: boolean = true;
-	let showControlsTimeout: any;
 	let lastMouseDown: any;
 
 	const handleMove = (e: any) => {
-		clearTimeout(showControlsTimeout);
-		showControlsTimeout = setTimeout(() => (showControls = false), 2500);
-		showControls;
-
 		if (!duration) return;
 		if (e.type !== 'touchmove' && !(e.buttons & 1)) return;
 
@@ -49,7 +43,7 @@
 		if (time > duration / 2) {
 			isHalfway.current = true;
 		}
-		if (Math.round(time) == Math.round(duration)) {
+		if (!isCompleted.current && Math.round(time) == Math.round(duration)) {
 			isCompleted.current = true;
 		}
 		isPaused.current = paused && hasPlayed && !videoElement?.ended;
