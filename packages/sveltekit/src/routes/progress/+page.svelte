@@ -242,6 +242,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 		gap: 0.75rem;
 		margin-bottom: 0.5rem;
+		align-items: stretch;
 	}
 
 	/* Area card */
@@ -249,6 +250,8 @@
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 12px;
 		padding: 1.5rem 1.75rem;
+		height: 100%;
+		box-sizing: border-box;
 	}
 	.area-heading {
 		margin: 0 0 1rem;
@@ -304,8 +307,8 @@
 		margin-bottom: 0.65rem;
 	}
 	.ex-title {
-		flex: 0 0 35%;
-		max-width: 35%;
+		flex: 0 0 48%;
+		max-width: 48%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
