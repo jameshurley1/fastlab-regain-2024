@@ -5,36 +5,6 @@
 	let duration: number = $state(0);
 	let paused: boolean = $state(false);
 	let hasPlayed: boolean = $state(false);
-	let lastMouseDown: any;
-
-	const handleMove = (e: any) => {
-		if (!duration) return;
-		if (e.type !== 'touchmove' && !(e.buttons & 1)) return;
-
-		const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-		const rect = videoElement?.getBoundingClientRect();
-		if (rect) {
-			const { left, right } = rect;
-			time = (duration * (clientX - left)) / (right - left);
-			if (videoElement) videoElement.currentTime = time;
-		}
-	};
-
-	// we can't rely on the built-in click event, because it fires
-	// after a drag — we have to listen for clicks ourselves
-	const handleMousedown = () => {
-		lastMouseDown = new Date();
-	};
-
-	const handleMouseup = (e: any) => {
-		isPaused.current = false;
-		let date = new Date();
-		if ((date as any) - lastMouseDown < 300) {
-			if (paused) e.target.play();
-			else e.target.pause();
-		}
-	};
-
 	$effect(() => {
 		if (!paused) hasPlayed = true;
 	});
@@ -74,10 +44,6 @@
 
 	<video
 		bind:this={videoElement}
-		onmousemove={handleMove}
-		ontouchmove={handleMove}
-		onmousedown={handleMousedown}
-		onmouseup={handleMouseup}
 		ontimeupdate={() => { time = videoElement?.currentTime ?? 0; }}
 		ondurationchange={() => { duration = videoElement?.duration ?? 0; }}
 		bind:paused
