@@ -5,12 +5,14 @@
 	let duration: number = $state(0);
 	let paused: boolean = $state(false);
 	let hasPlayed: boolean = $state(false);
+	let halfwayFired: boolean = false;
 	$effect(() => {
 		if (!paused) hasPlayed = true;
 	});
 
 	$effect(() => {
-		if (time > duration / 2 && !isHalfway.current) {
+		if (time > duration / 2 && !halfwayFired) {
+			halfwayFired = true;
 			isHalfway.current = true;
 		}
 		const newIsPaused = paused && hasPlayed && !videoElement?.ended;
