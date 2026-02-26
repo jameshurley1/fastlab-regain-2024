@@ -127,7 +127,7 @@
 			}
 		];
 
-		isCompleted.current = false;
+		untrack(() => { isCompleted.current = false; });
 	};
 
 	const handleRemoveMessage = () => {
