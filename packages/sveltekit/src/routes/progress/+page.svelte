@@ -240,6 +240,8 @@
 	.cards-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		grid-template-rows: repeat(3, auto);
+		grid-auto-flow: column;
 		gap: 0.75rem;
 		margin-bottom: 0.5rem;
 		align-items: start;
