@@ -10,6 +10,14 @@
 		if (!paused) hasPlayed = true;
 	});
 
+	// ⚠️ IMPORTANT — DO NOT MODIFY THIS EFFECT WITHOUT READING THIS FIRST
+	// halfwayFired is a plain (non-reactive) boolean on purpose.
+	// If you change it to a $state() variable or read isHalfway.current inside
+	// this effect, Svelte 5 will add it as a reactive dependency and re-run this
+	// effect every time isHalfway is reset in Messages.svelte — breaking the
+	// rep counter and post-video buttons. This was a recurring regression during
+	// development (Feb 2026). The fix: local boolean = no reactive dependency.
+	// Do NOT add any new store reads to this effect.
 	$effect(() => {
 		if (time > duration / 2 && !halfwayFired) {
 			halfwayFired = true;
