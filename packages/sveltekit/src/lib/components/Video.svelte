@@ -91,7 +91,7 @@
 		{autoplay}
 		{width}
 		{height}
-		controls={false}
+		controls={true}
 		muted
 	>
 		<track kind="captions" />
