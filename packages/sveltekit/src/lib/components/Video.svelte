@@ -22,6 +22,7 @@
 		if (rect) {
 			const { left, right } = rect;
 			time = (duration * (clientX - left)) / (right - left);
+			if (videoElement) videoElement.currentTime = time;
 		}
 	};
 
@@ -83,8 +84,8 @@
 		ontouchmove={handleMove}
 		onmousedown={handleMousedown}
 		onmouseup={handleMouseup}
-		bind:currentTime={time}
-		bind:duration
+		ontimeupdate={() => { time = videoElement?.currentTime ?? 0; }}
+		ondurationchange={() => { duration = videoElement?.duration ?? 0; }}
 		bind:paused
 		{src}
 		{autoplay}
