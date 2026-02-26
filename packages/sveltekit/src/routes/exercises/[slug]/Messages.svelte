@@ -11,6 +11,8 @@
 	// page visit don't trigger messages immediately on load. Runs synchronously
 	// before any $effect callbacks.
 	isPaused.current = false;
+	isCompleted.current = false;
+	isHalfway.current = false;
 	interaction.current = null;
 
 	const addPauseMessage = () => {

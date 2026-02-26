@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isPaused, isHalfway, isCompleted } from '$lib/utils/store';
+	import { isPaused, isHalfway } from '$lib/utils/store';
 
 	let time: number = $state(0);
 	let duration: number = $state(0);
@@ -12,9 +12,6 @@
 	$effect(() => {
 		if (time > duration / 2) {
 			isHalfway.current = true;
-		}
-		if (!isCompleted.current && Math.round(time) == Math.round(duration)) {
-			isCompleted.current = true;
 		}
 		const newIsPaused = paused && hasPlayed && !videoElement?.ended;
 		if (isPaused.current !== newIsPaused) isPaused.current = newIsPaused;
