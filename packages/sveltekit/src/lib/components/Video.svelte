@@ -4,25 +4,15 @@
 	let time: number = $state(0);
 	let duration: number = $state(0);
 	let paused: boolean = $state(false);
-	let showControls: boolean = $state(true);
-	let showControlsTimeout: ReturnType<typeof setTimeout> | undefined;
-	let lastMouseDown: Date | undefined;
-
-	function formatTime(seconds: number): string {
-		if (isNaN(seconds)) return '0:00';
-		const mins = Math.floor(seconds / 60);
-		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
-	}
-
-	const resetControlsTimer = () => {
-		showControls = true;
-		clearTimeout(showControlsTimeout);
-		showControlsTimeout = setTimeout(() => (showControls = false), 4000);
-	};
+	let hasPlayed: boolean = $state(false);
+	let showControls: boolean = true;
+	let showControlsTimeout: any;
+	let lastMouseDown: any;
 
 	const handleMove = (e: any) => {
-		resetControlsTimer();
+		clearTimeout(showControlsTimeout);
+		showControlsTimeout = setTimeout(() => (showControls = false), 2500);
+		showControls;
 
 		if (!duration) return;
 		if (e.type !== 'touchmove' && !(e.buttons & 1)) return;
@@ -32,6 +22,7 @@
 		if (rect) {
 			const { left, right } = rect;
 			time = (duration * (clientX - left)) / (right - left);
+			if (videoElement) videoElement.currentTime = time;
 		}
 	};
 
@@ -44,26 +35,15 @@
 	const handleMouseup = (e: any) => {
 		isPaused.current = false;
 		let date = new Date();
-		if ((date as any) - (lastMouseDown as any) < 300) {
-			if (videoElement) {
-				if (paused) videoElement.play();
-				else videoElement.pause();
-			}
+		if ((date as any) - lastMouseDown < 300) {
+			if (paused) e.target.play();
+			else e.target.pause();
 		}
 	};
 
-	const handleTimelineClick = (e: MouseEvent) => {
-		const bar = e.currentTarget as HTMLElement;
-		const rect = bar.getBoundingClientRect();
-		const fraction = (e.clientX - rect.left) / rect.width;
-		time = duration * Math.max(0, Math.min(1, fraction));
-	};
-
-	const togglePlay = () => {
-		if (!videoElement) return;
-		if (paused) videoElement.play();
-		else videoElement.pause();
-	};
+	$effect(() => {
+		if (!paused) hasPlayed = true;
+	});
 
 	$effect(() => {
 		if (time > duration / 2) {
@@ -72,10 +52,8 @@
 		if (Math.round(time) == Math.round(duration)) {
 			isCompleted.current = true;
 		}
-		paused ? (isPaused.current = true) : (isPaused.current = false);
+		isPaused.current = paused && hasPlayed && !videoElement?.ended;
 	});
-
-	let progress = $derived(duration ? (time / duration) * 100 : 0);
 
 	let {
 		videoElement = $bindable(),
@@ -92,14 +70,7 @@
 	} = $props();
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-	class="container"
-	onmousemove={handleMove}
-	ontouchmove={handleMove}
-	onmousedown={handleMousedown}
-	onmouseup={handleMouseup}
->
+<div class="container">
 	<div class="playback-animation">
 		<svg class="playback-icons">
 			<use class="hidden" href="#play-icon" />
@@ -109,44 +80,22 @@
 
 	<video
 		bind:this={videoElement}
-		bind:currentTime={time}
-		bind:duration
+		onmousemove={handleMove}
+		ontouchmove={handleMove}
+		onmousedown={handleMousedown}
+		onmouseup={handleMouseup}
+		ontimeupdate={() => { time = videoElement?.currentTime ?? 0; }}
+		ondurationchange={() => { duration = videoElement?.duration ?? 0; }}
 		bind:paused
 		{src}
 		{autoplay}
 		{width}
 		{height}
 		controls={false}
-		loop
 		muted
 	>
 		<track kind="captions" />
 	</video>
-
-	<div class="timeline" class:visible={showControls}>
-		<button class="timeline-play-btn" onclick={togglePlay} aria-label={paused ? 'Play' : 'Pause'}>
-			{#if paused}
-				<svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-					<path d="M8 5v14l11-7z"/>
-				</svg>
-			{:else}
-				<svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-					<rect x="6" y="4" width="4" height="16"/>
-					<rect x="14" y="4" width="4" height="16"/>
-				</svg>
-			{/if}
-		</button>
-
-		<span class="timeline-time">{formatTime(time)}</span>
-
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="timeline-bar" onclick={handleTimelineClick}>
-			<div class="timeline-bar-fill" style="width: {progress}%"></div>
-		</div>
-
-		<span class="timeline-time">{formatTime(duration)}</span>
-	</div>
 </div>
 
 <style>
@@ -154,14 +103,13 @@
 		width: 100%;
 		height: 100%;
 		display: flex;
-		position: relative;
 		border-radius: 16px;
 		justify-content: center;
 		align-items: center;
-		overflow: hidden;
 	}
 	video {
 		border-radius: 16px;
+		pointer-events: none;
 	}
 	.playback-animation {
 		pointer-events: none;
@@ -178,70 +126,5 @@
 		justify-content: center;
 		align-items: center;
 		opacity: 0;
-	}
-
-	.timeline {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: 10;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 8px 12px;
-		background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-		border-radius: 0 0 16px 16px;
-		opacity: 0;
-		transition: opacity 0.3s ease;
-		pointer-events: none;
-	}
-	.timeline.visible {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
-	.timeline-play-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		padding: 0;
-		flex-shrink: 0;
-	}
-	.timeline-play-btn:hover {
-		transform: scale(1.1);
-	}
-
-	.timeline-time {
-		color: white;
-		font-size: 13px;
-		font-family: monospace;
-		flex-shrink: 0;
-		min-width: 36px;
-		text-align: center;
-		user-select: none;
-	}
-
-	.timeline-bar {
-		flex: 1;
-		height: 4px;
-		background: rgba(255, 255, 255, 0.3);
-		border-radius: 2px;
-		cursor: pointer;
-		position: relative;
-	}
-	.timeline-bar:hover {
-		height: 6px;
-	}
-	.timeline-bar-fill {
-		height: 100%;
-		background: #69B34C;
-		border-radius: 2px;
-		transition: width 0.1s linear;
 	}
 </style>
