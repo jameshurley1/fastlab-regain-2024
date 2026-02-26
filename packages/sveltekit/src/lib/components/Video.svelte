@@ -103,7 +103,6 @@
 	}
 	video {
 		border-radius: 16px;
-		pointer-events: none;
 	}
 	.playback-animation {
 		pointer-events: none;
