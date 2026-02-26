@@ -189,7 +189,7 @@
 		display: flex;
 		flex-direction: column;
 		background: rgba(255, 255, 255, 0.1);
-		min-height: 100%;
+		min-height: calc(100vh - 200px);
 		padding: 1rem;
 		box-sizing: border-box;
 	}
