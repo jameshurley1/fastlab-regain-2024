@@ -242,7 +242,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 		gap: 0.75rem;
 		margin-bottom: 0.5rem;
-		align-items: stretch;
+		align-items: start;
 	}
 
 	/* Area card */
