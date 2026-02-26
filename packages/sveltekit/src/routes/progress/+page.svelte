@@ -6,7 +6,7 @@
 	const API = 'http://127.0.0.1:3001';
 
 	// All exercises from the API (for title + group membership)
-	let allExercises: (Exercise & { groups?: { area: string }[] })[] = $state([]);
+	let allExercises: Exercise[] = $state([]);
 	// Sessions for the current user
 	let sessions: Session[] = $state([]);
 	let loading = $state(true);
@@ -70,9 +70,42 @@
 		return Array.from(map, ([area, bars]) => ({ area, bars }));
 	});
 
+	// Patient-selected area groups: exercises from patientAreas not already in clinician assignments.
+	// Session history is always preserved regardless of current patientAreas setting.
+	const patientAreaGroups = $derived.by((): AreaGroup[] => {
+		const patientAreas = user.current?.patientAreas ?? [];
+		if (patientAreas.length === 0) return [];
+		const assignedIds = new Set(userAssignments.map((a) => a.exerciseId));
+		const map = new Map<string, BarData[]>();
+		const seen = new Set<string>();
+		for (const area of patientAreas) {
+			for (const ex of allExercises) {
+				if (seen.has(ex.id)) continue;
+				if (assignedIds.has(ex.id)) continue;
+				if (!(ex.groups ?? []).some((g) => g.area === area)) continue;
+				seen.add(ex.id);
+				const bar: BarData = {
+					exerciseId: ex.id,
+					title: ex.title,
+					targetReps: 0,
+					repsCompleted: latestReps(ex.id)
+				};
+				if (!map.has(area)) map.set(area, []);
+				map.get(area)!.push(bar);
+			}
+		}
+		return Array.from(map, ([area, bars]) => ({ area, bars })).filter((g) => g.bars.length > 0);
+	});
+
 	function barPercent(reps: number, target: number): number {
 		if (target <= 0) return 0;
 		return Math.min(100, Math.round((reps / target) * 100));
+	}
+
+	// For patient-selected exercises with no target, use 10 reps as a soft reference.
+	function patientBarPercent(reps: number): number {
+		if (reps <= 0) return 0;
+		return Math.min(100, Math.round((reps / 10) * 100));
 	}
 
 	function barColor(pct: number): string {
@@ -88,38 +121,75 @@
 			<div class="spinner"></div>
 			<p>Loading progress…</p>
 		</div>
-	{:else if areaGroups.length === 0}
+	{:else if areaGroups.length === 0 && patientAreaGroups.length === 0}
 		<div class="empty-state">
 			<i class="material-icons" style="font-size: 3rem; opacity: 0.4;">bar_chart</i>
 			<p>No exercises assigned yet.</p>
 			<p class="hint">Ask your clinician to assign exercises in the admin panel.</p>
 		</div>
 	{:else}
-		<LayoutGrid>
-			{#each areaGroups as group}
-				<Cell span={6}>
-					<div class="area-card">
-						<h3 class="area-heading">{group.area}</h3>
-						{#each group.bars as bar}
-							{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
-							<div class="bar-row">
-								<div class="bar-label">
-									<span class="ex-title">{bar.title}</span>
-									<span class="rep-fraction">{bar.repsCompleted} / {bar.targetReps}</span>
+		{#if areaGroups.length > 0}
+			<LayoutGrid>
+				{#each areaGroups as group}
+					<Cell span={6}>
+						<div class="area-card">
+							<h3 class="area-heading">{group.area}</h3>
+							{#each group.bars as bar}
+								{@const pct = barPercent(bar.repsCompleted, bar.targetReps)}
+								<div class="bar-row">
+									<div class="bar-label">
+										<span class="ex-title">{bar.title}</span>
+										<span class="rep-fraction">{bar.repsCompleted} / {bar.targetReps}</span>
+									</div>
+									<div class="bar-track">
+										<div
+											class="bar-fill"
+											style="width: {pct}%; background: {barColor(pct)};"
+										></div>
+									</div>
+									<span class="pct-label">{pct}%</span>
 								</div>
-								<div class="bar-track">
-									<div
-										class="bar-fill"
-										style="width: {pct}%; background: {barColor(pct)};"
-									></div>
+							{/each}
+						</div>
+					</Cell>
+				{/each}
+			</LayoutGrid>
+		{/if}
+
+		{#if patientAreaGroups.length > 0}
+			<div class="patient-section-header">
+				<h2 class="patient-section-title">Your additions</h2>
+				<span class="patient-section-hint">Areas you selected — no clinician target set</span>
+			</div>
+			<LayoutGrid>
+				{#each patientAreaGroups as group}
+					<Cell span={6}>
+						<div class="area-card patient-card">
+							<h3 class="area-heading patient-area-heading">
+								{group.area}
+								<span class="patient-label">Your choice</span>
+							</h3>
+							{#each group.bars as bar}
+								{@const pct = patientBarPercent(bar.repsCompleted)}
+								<div class="bar-row">
+									<div class="bar-label">
+										<span class="ex-title">{bar.title}</span>
+										<span class="rep-fraction">{bar.repsCompleted} reps</span>
+									</div>
+									<div class="bar-track">
+										<div
+											class="bar-fill"
+											style="width: {pct}%; background: {barColor(pct)};"
+										></div>
+									</div>
+									<span class="pct-label">{pct > 0 ? `${pct}%` : 'not started'}</span>
 								</div>
-								<span class="pct-label">{pct}%</span>
-							</div>
-						{/each}
-					</div>
-				</Cell>
-			{/each}
-		</LayoutGrid>
+							{/each}
+						</div>
+					</Cell>
+				{/each}
+			</LayoutGrid>
+		{/if}
 	{/if}
 </div>
 
@@ -190,6 +260,43 @@
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 		opacity: 0.85;
+	}
+
+	/* Patient-selected section */
+	.patient-section-header {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 0.5rem 0.5rem 0;
+	}
+	.patient-section-title {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #57c9d5;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+	.patient-section-hint {
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.45);
+	}
+	.patient-card {
+		border: 1px solid rgba(87, 201, 213, 0.25);
+	}
+	.patient-area-heading {
+		color: #57c9d5 !important;
+		opacity: 1 !important;
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+	.patient-label {
+		font-size: 0.7rem;
+		font-weight: 400;
+		text-transform: none;
+		letter-spacing: 0;
+		opacity: 0.65;
 	}
 
 	/* Bar rows */

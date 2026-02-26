@@ -19,6 +19,7 @@ type User = {
   overallProgress: number;
   groups: Group[];
   exercises: UserExercise[];
+  patientAreas?: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -71,6 +72,7 @@ type Exercise = {
   videoKey: string;
   image?: string;
   video?: string;
+  groups?: { id: string; area: string }[];
   createdAt: string;
   updatedAt: string;
 }

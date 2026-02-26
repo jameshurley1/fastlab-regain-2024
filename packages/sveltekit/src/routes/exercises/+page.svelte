@@ -32,13 +32,16 @@
 </script>
 
 <div class="exercises">
+	{#if additionalExercises.length}
+		<h3 class="section-heading">Your assigned exercises</h3>
+	{/if}
 	<LayoutGrid>
 		{#each filteredExercises as exercise}
 			<Exercise {exercise} />
 		{/each}
 	</LayoutGrid>
 	{#if additionalExercises.length}
-		<h3 class="additional-heading">Additional exercises you can try</h3>
+		<h3 class="section-heading additional-heading">Your additional exercises</h3>
 		<LayoutGrid>
 			{#each additionalExercises as exercise}
 				<Exercise {exercise} />
@@ -58,8 +61,14 @@
 		background: rgba(255, 255, 255, 0.1);
 		z-index: 0;
 	}
-	.additional-heading {
+	.section-heading {
 		align-self: flex-start;
 		padding: 1rem 1.5rem 0;
+		color: white;
+		opacity: 0.85;
 	}
-	</style>
+	.additional-heading {
+		color: #57c9d5;
+		opacity: 1;
+	}
+</style>

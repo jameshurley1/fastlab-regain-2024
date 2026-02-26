@@ -70,7 +70,8 @@ export const user = new PersistedState<User>(
 		onboard: false,
 		overallProgress: 0,
 		groups: [],
-		exercises: []
+		exercises: [],
+		patientAreas: []
 	},
 	{ storage: 'local' }
 );

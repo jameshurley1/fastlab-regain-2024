@@ -36,6 +36,15 @@
 		submitted = true;
 	};
 
+	// After saving patientAreas, sync the in-memory store so the change
+	// is visible immediately and survives a page reload (localStorage).
+	function enhanceSavePatientAreas() {
+		return async ({ update }: { update: () => Promise<void> }) => {
+			await update();
+			user.current = { ...user.current, patientAreas };
+		};
+	}
+
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
@@ -153,7 +162,7 @@
 								/>
 							</svg>
 						</div>
-						<form method="POST" action="?/savePatientAreas" use:enhance>
+						<form method="POST" action="?/savePatientAreas" use:enhance={enhanceSavePatientAreas}>
 							<input type="hidden" name="email" value={user.current?.email ?? ''} />
 							<input type="hidden" name="patientAreas" value={JSON.stringify(patientAreas)} />
 							<Button type="submit" variant="raised">Save my area selections</Button>
