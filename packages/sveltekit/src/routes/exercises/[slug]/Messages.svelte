@@ -145,10 +145,23 @@
 	};
 
 	$effect(() => {
-		isHalfway.current && addHalfwayMessage();
-		isPaused.current && addPauseMessage();
-		isCompleted.current && addCompletedMessage();
-		handleMessageTimeout();
+		if (isHalfway.current) {
+			addHalfwayMessage();
+			handleMessageTimeout();
+		}
+	});
+
+	$effect(() => {
+		if (isPaused.current) {
+			addPauseMessage();
+		}
+	});
+
+	$effect(() => {
+		if (isCompleted.current) {
+			addCompletedMessage();
+			handleMessageTimeout();
+		}
 	});
 </script>
 
