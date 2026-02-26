@@ -250,7 +250,6 @@
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 12px;
 		padding: 1.5rem 1.75rem;
-		height: 100%;
 		box-sizing: border-box;
 	}
 	.area-heading {
