@@ -31,8 +31,11 @@
 	let { data }: { data: PageData } = $props();
 
 	$effect(() => {
+		console.log('effect ran, videoElement:', videoElement);
 		if (videoElement) {
+			console.log('attaching ended listener');
 			videoElement.addEventListener('ended', () => {
+				console.log('ended fired!');
 				playCount += 1;
 				reps += 1;
 				videoCompleted = true;
