@@ -32,10 +32,7 @@
 
 	$effect(() => {
 		if (videoElement) {
-			console.log('effect ran, videoElement:', videoElement);
-			console.log('attaching ended listener');
 			const handleEnded = () => {
-				console.log('ended fired!');
 				playCount += 1;
 				reps += 1;
 				videoCompleted = true;
