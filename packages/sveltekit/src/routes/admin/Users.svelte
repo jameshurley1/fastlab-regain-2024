@@ -84,6 +84,11 @@
 		draftExercises = draftExercises.filter((e) => e.exerciseId !== exerciseId);
 	}
 
+	function addAllExercises() {
+		const toAdd = unassigned.map((ex) => ({ exerciseId: ex.id, targetReps: 10 }));
+		draftExercises = [...draftExercises, ...toAdd];
+	}
+
 	// Single save: persist both groups and exercises together via /user/update
 	async function saveUser() {
 		if (!selectedUser) return;
@@ -248,6 +253,9 @@
 						disabled={!addSelectValue}
 					>
 						<i class="material-icons">add</i> Add
+					</button>
+					<button class="add-btn" onclick={addAllExercises}>
+						<i class="material-icons">add</i> Add All
 					</button>
 				</div>
 			{/if}
