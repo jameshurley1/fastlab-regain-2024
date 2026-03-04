@@ -7,9 +7,21 @@
 	let open: boolean = $state(false);
 
 	let { group }: { group: Group } = $props();
+
+	const areaColors: Record<string, string> = {
+		'Head': '#4CAF50',
+		'Shoulders': '#2196F3',
+		'Arms': '#FF9800',
+		'Chest': '#E91E63',
+		'Core/Abdomen': '#9C27B0',
+		'Legs': '#00BCD4',
+		'Hands': '#FF5722',
+	};
+
+	const color = areaColors[group.area] ?? '#607D8B';
 </script>
 
-<Card style="border-radius: 16px; height: 100%;">
+<Card style="border-radius: 16px; height: 100%; overflow: hidden;">
 	<PrimaryAction
 		onclick={() => {
 			currentMode.current = 'display';
@@ -17,14 +29,9 @@
 			goto(`/admin/groups/${group.id}`);
 		}}
 	>
-		<Content style="padding: 1.5rem 1rem;">
-			<div class="card-body">
-				<span class="material-icons area-icon">fitness_center</span>
-				<h2>
-					{group.area}
-				</h2>
-			</div>
-		</Content>
+		<div class="color-block" style="background-color: {color};">
+			<h2>{group.area}</h2>
+		</div>
 	</PrimaryAction>
 	{#if user}
 		<Actions>
@@ -42,22 +49,19 @@
 -->
 
 <style>
-	.card-body {
+	.color-block {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		min-height: 120px;
-		gap: 0.75rem;
-	}
-	.area-icon {
-		font-size: 2.5rem;
-		opacity: 0.5;
+		padding: 1.5rem 1rem;
 	}
 	h2 {
 		margin: 0;
 		font-size: 1.4rem;
+		font-weight: 600;
 		text-align: center;
+		color: white;
 		word-break: break-word;
 	}
 </style>

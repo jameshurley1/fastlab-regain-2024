@@ -4,9 +4,7 @@
 		Actions,
 		ActionIcons,
 		Content,
-		Media,
 		PrimaryAction,
-		MediaContent
 	} from '@smui/card';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { goto } from '$app/navigation';
@@ -65,8 +63,7 @@
 			goto(`/admin/exercises/${exercise.id}`);
 		}}
 	>
-		<Media class="card-media-16x9" aspectRatio="16x9">
-			<MediaContent>
+		<div class="image-area">
 				<div
 					use:lazyLoad
 					onisVisible={() => {
@@ -84,8 +81,7 @@
 						<div class="loader"></div>
 					{/if}
 				</div>
-			</MediaContent>
-		</Media>
+			</div>
 		<Content style="padding: 1rem;">
 			<div class="subtitle">
 				<h3 class="mdc-typography--headline6">
@@ -113,6 +109,15 @@
 -->
 
 <style>
+	.image-area {
+		position: relative;
+		height: 120px;
+		overflow: hidden;
+		border-radius: 16px 16px 0 0;
+	}
+	.image-area > div {
+		height: 100%;
+	}
 	img {
 		width: 100%;
 		height: 100%;
