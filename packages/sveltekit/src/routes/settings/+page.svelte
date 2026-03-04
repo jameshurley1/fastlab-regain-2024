@@ -63,7 +63,10 @@
 								width="56.594"
 								height="95.031"
 								viewBox="0 0 56.594 95.031"
-								onclick={() => toggleArea('Head')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Head')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Head')}
 								style={assignedAreaNames.has('Head') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -78,7 +81,10 @@
 								width="109.532"
 								height="46.594"
 								viewBox="0 0 109.532 46.594"
-								onclick={() => toggleArea('Shoulders')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Shoulders')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Shoulders')}
 								style={assignedAreaNames.has('Shoulders') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -93,7 +99,10 @@
 								width="156.344"
 								height="119.25"
 								viewBox="0 0 156.344 119.25"
-								onclick={() => toggleArea('Arms')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Arms')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Arms')}
 								style={assignedAreaNames.has('Arms') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -108,7 +117,10 @@
 								width="86.594"
 								height="45.063"
 								viewBox="0 0 86.594 45.063"
-								onclick={() => toggleArea('Chest')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Chest')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Chest')}
 								style={assignedAreaNames.has('Chest') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -123,7 +135,10 @@
 								width="75.25"
 								height="107.594"
 								viewBox="0 0 75.25 107.594"
-								onclick={() => toggleArea('Core/Abdomen')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Core/Abdomen')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Core/Abdomen')}
 								style={assignedAreaNames.has('Core/Abdomen') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -138,7 +153,10 @@
 								width="93.626"
 								height="286.625"
 								viewBox="0 0 93.626 286.625"
-								onclick={() => toggleArea('Legs')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Legs')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Legs')}
 								style={assignedAreaNames.has('Legs') ? '' : 'cursor: pointer'}
 							>
 								<path
@@ -153,7 +171,10 @@
 								width="205"
 								height="38.938"
 								viewBox="0 0 205 38.938"
-								onclick={() => toggleArea('Hands')}
+								role="button"
+							tabindex="0"
+							onclick={() => toggleArea('Hands')}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea('Hands')}
 								style={assignedAreaNames.has('Hands') ? '' : 'cursor: pointer'}
 							>
 								<path
