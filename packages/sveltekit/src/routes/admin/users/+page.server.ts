@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 
 export const load = (async () => {
-	const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
+	const apiUrl = process.env.LOCAL_API_URL ?? 'http://127.0.0.1:3001';
 
 	const [usersResponse, sessionsResponse, ratingsResponse, exercisesResponse] = await Promise.all([
 		fetch(apiUrl + '/user/list'),

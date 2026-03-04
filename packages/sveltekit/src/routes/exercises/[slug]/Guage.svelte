@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { interaction, pain, difficult } from '$lib/utils/store';
 	import Card, { Content, Actions } from '@smui/card';
 	import Button from '@smui/button';
@@ -11,8 +10,7 @@
 		exerciseId: string;
 	} = $props();
 
-	let formEl: HTMLFormElement | undefined = $state();
-	let selectedRating = $state(0);
+	let submitting = $state(false);
 
 	let question = $derived(
 		type === 'difficult'
@@ -40,9 +38,27 @@
 
 	const buttons = $derived(type === 'difficult' ? DIFFICULTY_BUTTONS : PAIN_BUTTONS);
 
-	function selectRating(rating: number) {
-		selectedRating = rating;
-		formEl?.requestSubmit();
+	async function selectRating(rating: number) {
+		if (submitting) return;
+		submitting = true;
+
+		// Build FormData explicitly so the rating value is always correct —
+		// avoids the Svelte 5 DOM batching issue where a hidden input's value
+		// may not yet reflect updated $state when requestSubmit() fires.
+		const fd = new FormData();
+		fd.set('userId', userId);
+		fd.set('exerciseId', exerciseId);
+		fd.set('type', type);
+		fd.set('rating', String(rating));
+
+		try {
+			await fetch('?/submitRating', { method: 'POST', body: fd });
+		} catch {
+			// best-effort save; still show the appropriate message
+		}
+
+		showPostRatingMessage(rating);
+		submitting = false;
 	}
 
 	function showPostRatingMessage(rating: number) {
@@ -81,38 +97,23 @@
 	}
 </script>
 
-<form
-	bind:this={formEl}
-	method="POST"
-	action="?/submitRating"
-	use:enhance={() => {
-		return async ({ result }: { result: any }) => {
-			showPostRatingMessage(selectedRating);
-		};
-	}}
->
-	<input type="hidden" name="userId" value={userId} />
-	<input type="hidden" name="exerciseId" value={exerciseId} />
-	<input type="hidden" name="type" value={type} />
-	<input type="hidden" name="rating" value={selectedRating} />
-
-	<Card style="border-radius: 16px;">
-		<Content>
-			<h2 class="mdc-typography--headline6">
-				{type === 'difficult' ? 'Complexity' : 'Pain'}
-			</h2>
-			<p>{question}</p>
-		</Content>
-		<Actions fullBleed>
-			{#each buttons as btn}
-				<Button
-					style="background: {btn.color}; color: white;"
-					onclick={() => selectRating(btn.value)}
-				>{btn.label}</Button>
-			{/each}
-		</Actions>
-	</Card>
-</form>
+<Card style="border-radius: 16px;">
+	<Content>
+		<h2 class="mdc-typography--headline6">
+			{type === 'difficult' ? 'Complexity' : 'Pain'}
+		</h2>
+		<p>{question}</p>
+	</Content>
+	<Actions fullBleed>
+		{#each buttons as btn}
+			<Button
+				style="background: {btn.color}; color: white;"
+				disabled={submitting}
+				onclick={() => selectRating(btn.value)}
+			>{btn.label}</Button>
+		{/each}
+	</Actions>
+</Card>
 <div class="spacer"></div>
 
 <style>

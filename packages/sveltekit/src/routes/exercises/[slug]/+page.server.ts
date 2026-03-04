@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 
-const apiUrl = process.env.LOCAL_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.LOCAL_API_URL ?? 'http://127.0.0.1:3001';
 
 export const load: PageServerLoad = (async ({ params, locals }) => {
 	// Fetch the exercise
