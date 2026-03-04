@@ -44,7 +44,7 @@
 	</header-panel>
 {/if}
 
-<posts-panel>
+<div class="posts-panel">
 	{#if groups.current}
 		<LayoutGrid>
 			{#each groups.current as group}
@@ -54,13 +54,12 @@
 			{/each}
 		</LayoutGrid>
 	{/if}
-</posts-panel>
+</div>
 
 <style>
-	posts-panel {
-		display: flex;
+	.posts-panel {
+		display: block;
 		position: relative;
-		height: 100%;
 	}
 	header-panel {
 		display: flex;

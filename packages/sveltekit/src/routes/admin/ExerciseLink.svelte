@@ -131,6 +131,8 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		font-size: 0.9rem;
+		line-height: 1.4;
 	}
 	.subtitle p {
 		margin: 0;

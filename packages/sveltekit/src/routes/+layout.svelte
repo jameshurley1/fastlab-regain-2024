@@ -12,7 +12,9 @@
 <div class="root app-content">
 	<Overlay />
 	<Header	authenticated={data.authenticated} />
-	{@render children?.()}
+	<div class="page-content">
+		{@render children?.()}
+	</div>
 	<Footer />
 </div>
 
@@ -21,5 +23,8 @@
 		min-height: 100%;
 		height: 100%;
 		background: #132a13;
+	}
+	.page-content {
+		flex: 1;
 	}
 </style>
