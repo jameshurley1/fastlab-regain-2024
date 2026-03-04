@@ -60,6 +60,8 @@
 <Card style="border-radius: 16px; height: 100%;">
 	<PrimaryAction
 		onclick={() => {
+			currentExercise.current = exercise;
+			currentMode.current = 'display';
 			goto(`/admin/exercises/${exercise.id}`);
 		}}
 	>
@@ -117,16 +119,13 @@
 		object-fit: cover;
 	}
 	.subtitle {
-		display: flex;
 		width: 100%;
-		flex-direction: column;
-		overflow: hidden;
 	}
 	.subtitle h3 {
 		margin: 0 0 0.25rem;
-		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.subtitle p {
 		margin: 0;

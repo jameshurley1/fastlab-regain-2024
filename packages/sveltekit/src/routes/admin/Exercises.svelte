@@ -61,9 +61,8 @@
 
 <style>
 	.posts-panel {
-		display: flex;
+		display: block;
 		position: relative;
-		height: 100%;
 	}
 	.header-panel {
 		display: flex;
