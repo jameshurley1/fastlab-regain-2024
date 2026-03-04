@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { user } from '$lib/utils/store';
 
 	const API = 'http://127.0.0.1:3001';
 
@@ -89,6 +90,28 @@
 		draftExercises = [...draftExercises, ...toAdd];
 	}
 
+	let pendingDeleteEmail: string | null = $state(null);
+	let deleting = $state(false);
+
+	async function confirmDelete() {
+		if (!pendingDeleteEmail) return;
+		deleting = true;
+		try {
+			const res = await fetch(`${API}/user/delete`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: pendingDeleteEmail })
+			});
+			if (res.ok) {
+				if (selectedUser?.email === pendingDeleteEmail) selectedUser = null;
+				users = users.filter((u) => u.email !== pendingDeleteEmail);
+			}
+		} finally {
+			deleting = false;
+			pendingDeleteEmail = null;
+		}
+	}
+
 	// Single save: persist both groups and exercises together via /user/update
 	async function saveUser() {
 		if (!selectedUser) return;
@@ -156,15 +179,36 @@
 	<div class="user-list">
 		<h3>Users ({users.length})</h3>
 		{#each users as u}
-			<button
-				class="user-row"
-				class:selected={selectedUser?.email === u.email}
-				onclick={() => selectUser(u)}
-			>
-				<i class="material-icons user-icon">person</i>
-				<span>{u.email}</span>
-			</button>
+			<div class="user-row" class:selected={selectedUser?.email === u.email}>
+				<button class="user-row-main" onclick={() => selectUser(u)}>
+					<i class="material-icons user-icon">person</i>
+					<span>{u.email}</span>
+				</button>
+				<button
+					class="delete-user-btn"
+					title="Delete user"
+					disabled={u.email === user.current?.email}
+					onclick={() => (pendingDeleteEmail = u.email)}
+				>
+					<i class="material-icons">delete</i>
+				</button>
+			</div>
 		{/each}
+
+		{#if pendingDeleteEmail}
+			<div class="confirm-overlay">
+				<div class="confirm-box">
+					<p>Delete <strong>{pendingDeleteEmail}</strong> and all their data?</p>
+					<p class="confirm-warn">This cannot be undone.</p>
+					<div class="confirm-actions">
+						<button class="confirm-cancel" onclick={() => (pendingDeleteEmail = null)}>Cancel</button>
+						<button class="confirm-delete" onclick={confirmDelete} disabled={deleting}>
+							{deleting ? 'Deleting…' : 'Delete'}
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
 	</div>
 
 	<!-- ── Right: detail panel ── -->
@@ -345,27 +389,106 @@
 	.user-row {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.6rem 0.75rem;
 		border-radius: 8px;
-		border: none;
 		background: rgba(255, 255, 255, 0.08);
-		color: white;
-		cursor: pointer;
-		text-align: left;
-		font-size: 0.95rem;
 		transition: background 0.15s;
+		overflow: hidden;
 	}
 	.user-row:hover {
 		background: rgba(255, 255, 255, 0.15);
 	}
 	.user-row.selected {
 		background: rgba(255, 255, 255, 0.25);
+	}
+	.user-row-main {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex: 1;
+		padding: 0.6rem 0.75rem;
+		border: none;
+		background: none;
+		color: white;
+		cursor: pointer;
+		text-align: left;
+		font-size: 0.95rem;
+		font-weight: inherit;
+	}
+	.selected .user-row-main {
 		font-weight: 600;
+	}
+	.delete-user-btn {
+		display: flex;
+		align-items: center;
+		padding: 0 0.5rem;
+		border: none;
+		background: none;
+		color: rgba(255, 80, 80, 0.7);
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+	.user-row:hover .delete-user-btn {
+		opacity: 1;
+	}
+	.delete-user-btn:disabled {
+		display: none;
 	}
 	.user-icon {
 		font-size: 1.1rem;
 		opacity: 0.7;
+	}
+	.confirm-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+	}
+	.confirm-box {
+		background: #1e3a1e;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 12px;
+		padding: 1.5rem 2rem;
+		max-width: 360px;
+		width: 90%;
+		color: white;
+	}
+	.confirm-box p {
+		margin: 0 0 0.5rem;
+	}
+	.confirm-warn {
+		font-size: 0.85rem;
+		opacity: 0.6;
+	}
+	.confirm-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+		margin-top: 1.25rem;
+	}
+	.confirm-cancel {
+		padding: 0.45rem 1.25rem;
+		border-radius: 6px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		background: none;
+		color: white;
+		cursor: pointer;
+	}
+	.confirm-delete {
+		padding: 0.45rem 1.25rem;
+		border-radius: 6px;
+		border: none;
+		background: #c0392b;
+		color: white;
+		cursor: pointer;
+		font-weight: 600;
+	}
+	.confirm-delete:disabled {
+		opacity: 0.5;
+		cursor: default;
 	}
 
 	/* ── Detail panel ── */

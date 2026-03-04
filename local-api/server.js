@@ -339,7 +339,11 @@ async function handleRequest(req, res) {
   }
   if (method === 'DELETE' && pathname === '/user/delete') {
     const body = await parseBody(req);
+    const target = db.users.find((u) => u.email === body.email);
     db.users = db.users.filter((u) => u.email !== body.email);
+    if (target) {
+      db.sessions = db.sessions.filter((s) => s.userId !== target.id);
+    }
     saveDb(db);
     return json(res, { message: 'User deleted' });
   }

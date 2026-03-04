@@ -238,6 +238,7 @@
 			<ButtonLabel>NO</ButtonLabel>
 		</Button>
 		<form class="form" method="POST" action="?/removeData" use:enhance={onSubmit}>
+			<input type="hidden" name="email" value={user.current?.email ?? ''} />
 			<Button class="error-button" type="submit" variant="raised">
 				<ButtonLabel>YES, REMOVE MY REGAIN ACCOUNT</ButtonLabel>
 			</Button>

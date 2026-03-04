@@ -1,13 +1,24 @@
+import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import { SESSION_COOKIE_NAME } from '$lib/utils/constants.js';
+
+const API_URL = process.env.LOCAL_API_URL ?? 'http://127.0.0.1:3001';
 
 export const actions = {
-  async removeData({ request }: { request: Request }) {
+  async removeData({ request, cookies }) {
     const formData = await request.formData();
     const email = formData.get('email')?.toString();
 
-    // Write this method later.
-    console.log(email);
+    if (email) {
+      await fetch(`${API_URL}/user/delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      }).catch(() => {});
+    }
 
+    cookies.delete(SESSION_COOKIE_NAME, { path: '/' });
+    throw redirect(302, '/auth/login');
   },
   async saveSettings({ request }: { request: Request }) {
     const formData = await request.formData();
