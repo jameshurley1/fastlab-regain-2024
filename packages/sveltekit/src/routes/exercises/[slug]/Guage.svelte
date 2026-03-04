@@ -38,33 +38,32 @@
 
 	const buttons = $derived(type === 'difficult' ? DIFFICULTY_BUTTONS : PAIN_BUTTONS);
 
-	async function selectRating(rating: number) {
+	function selectRating(rating: number) {
 		if (submitting) return;
 		submitting = true;
 
-		// Build FormData explicitly so the rating value is always correct —
-		// avoids the Svelte 5 DOM batching issue where a hidden input's value
-		// may not yet reflect updated $state when requestSubmit() fires.
-		const fd = new FormData();
-		fd.set('userId', userId);
-		fd.set('exerciseId', exerciseId);
-		fd.set('type', type);
-		fd.set('rating', String(rating));
-
-		try {
-			await fetch('?/submitRating', { method: 'POST', body: fd });
-		} catch {
-			// best-effort save; still show the appropriate message
-		}
-
+		// Show the message FIRST — before clearing pain/difficult flags.
+		// Svelte 5 fine-grained reactivity can unmount this component
+		// synchronously once pain.current / difficult.current become false,
+		// so we must set interaction.current while the component is still live.
 		showPostRatingMessage(rating);
-		submitting = false;
+
+		// Background save — fire and forget, JSON body avoids FormData
+		// multipart parsing issues with SvelteKit form actions.
+		fetch('/api/rating', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				userId,
+				exerciseId,
+				type,
+				rating,
+				timestamp: new Date().toISOString()
+			})
+		}).catch(() => {});
 	}
 
 	function showPostRatingMessage(rating: number) {
-		pain.current = false;
-		difficult.current = false;
-
 		if (type === 'pain') {
 			// PAIN THRESHOLD: currently set to 3. Review with clinicians before deployment.
 			if (rating <= 3) {
@@ -93,7 +92,12 @@
 				];
 			}
 		}
-		// For difficulty: dismiss quietly, no message
+		// For difficulty: no message — gauge just disappears
+
+		// Clear the flags AFTER setting interaction.current so the store write
+		// completes before Svelte unmounts this component.
+		pain.current = false;
+		difficult.current = false;
 	}
 </script>
 
