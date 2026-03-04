@@ -12,7 +12,7 @@
 		new Chart(polarCanvas, {
 			type: 'polarArea',
 			data: {
-				labels: ['Head', 'Shoulders', 'Arms', 'Chest', 'Stomach', 'Legs'],
+				labels: ['Head', 'Shoulders', 'Arms', 'Chest', 'Core/Abdomen', 'Legs'],
 				datasets: [
 					{
 						data: [100, 100, 82, 100, 100, 100],

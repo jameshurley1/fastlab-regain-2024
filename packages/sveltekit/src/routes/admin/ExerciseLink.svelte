@@ -40,12 +40,15 @@
 		submitting = true;
 		return async ({ result }: { result: any }) => {
 			submitting = false;
-			if (result.data.url) {
+			if (result.data?.url) {
 				action = { success: result.status === 200, key: result.data.url };
 				const url = await fetch(action.key);
 				if (url.status === 404) {
 					notfound = true;
 				}
+				loaded = true;
+			} else {
+				notfound = true;
 				loaded = true;
 			}
 		};
@@ -70,6 +73,11 @@
 				>
 					{#if action.success === true && notfound === false}
 						<img src={action.key} alt="Video Thumbnail" loading="lazy" />
+					{:else if notfound || loaded}
+						<div class="placeholder">
+							<Icon class="material-icons">videocam</Icon>
+							<p>{exercise.title}</p>
+						</div>
 					{:else}
 						<div class="loader"></div>
 					{/if}
@@ -81,7 +89,7 @@
 				<h3 class="mdc-typography--headline6">
 					{exercise.title}
 				</h3>
-				<p class="mdc-typography--headline3">
+				<p class="mdc-typography--body2">
 					{exercise.description}
 				</p>
 			</div>
@@ -101,3 +109,65 @@
 <!--
   <DeleteModal object={exercise} type="exercise" bind:open />
 -->
+
+<style>
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.subtitle {
+		display: flex;
+		width: 100%;
+		flex-direction: column;
+		overflow: hidden;
+	}
+	.subtitle h3 {
+		margin: 0 0 0.25rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.subtitle p {
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.placeholder {
+		display: flex;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		background-color: hsl(0, 0%, 92%);
+		color: hsl(0, 0%, 50%);
+	}
+	.placeholder p {
+		margin: 0.5em 0 0;
+		font-size: 0.8rem;
+	}
+	.loader {
+		display: flex;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		animation: pulse 2s infinite;
+	}
+	@keyframes pulse {
+		0%,
+		100% {
+			background-color: hsl(0, 0%, 95%);
+		}
+		50% {
+			background-color: hsl(0, 0%, 90%);
+		}
+	}
+</style>

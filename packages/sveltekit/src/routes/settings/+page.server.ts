@@ -16,7 +16,7 @@ export const actions = {
     const shoulder = formData.get('shoulder')?.toString();
     const arm = formData.get('arm')?.toString();
     const chest = formData.get('chest')?.toString();
-    const stomach = formData.get('stomach')?.toString();
+    const coreAbdomen = formData.get('core-abdomen')?.toString();
     const legs = formData.get('legs')?.toString();
     const hands = formData.get('hands')?.toString();
 
@@ -37,7 +37,7 @@ export const actions = {
               shoulder: shoulder,
               arm: arm,
               chest: chest,
-              stomach: stomach,
+              coreAbdomen: coreAbdomen,
               legs: legs,
               hands: hands
             }

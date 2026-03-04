@@ -48,7 +48,7 @@
 	{#if groups.current}
 		<LayoutGrid>
 			{#each groups.current as group}
-				<Cell spanDevices={{ phone: 12, tablet: 4, desktop: 3 }}>
+				<Cell spanDevices={{ phone: 12, tablet: 6, desktop: 4 }}>
 					<GroupLink {group} />
 				</Cell>
 			{/each}

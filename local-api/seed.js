@@ -13,13 +13,13 @@ const groups = [
   { id: randomUUID(), area: 'Shoulders', users: [], exercises: [], createdAt: now, updatedAt: now },
   { id: randomUUID(), area: 'Arms', users: [], exercises: [], createdAt: now, updatedAt: now },
   { id: randomUUID(), area: 'Chest', users: [], exercises: [], createdAt: now, updatedAt: now },
-  { id: randomUUID(), area: 'Stomach', users: [], exercises: [], createdAt: now, updatedAt: now },
+  { id: randomUUID(), area: 'Core/Abdomen', users: [], exercises: [], createdAt: now, updatedAt: now },
   { id: randomUUID(), area: 'Legs', users: [], exercises: [], createdAt: now, updatedAt: now },
   { id: randomUUID(), area: 'Hands', users: [], exercises: [], createdAt: now, updatedAt: now },
 ];
 
 // Group indices for readability
-const HEAD = 0, SHOULDERS = 1, ARMS = 2, CHEST = 3, STOMACH = 4, LEGS = 5, HANDS = 6;
+const HEAD = 0, SHOULDERS = 1, ARMS = 2, CHEST = 3, CORE_ABDOMEN = 4, LEGS = 5, HANDS = 6;
 
 const exercises = [
   {
@@ -128,7 +128,7 @@ const exercises = [
     description: 'Core strengthening exercise performed while seated to target abdominal muscles.',
     imageKey: 'captains-chair.svg',
     videoKey: '10 - Captain_s Chair 720p.mp4',
-    groups: [groups[STOMACH]],
+    groups: [groups[CORE_ABDOMEN]],
     createdAt: now,
     updatedAt: now,
   },
@@ -161,7 +161,7 @@ const exercises = [
     description: 'Forward bending stretch performed while seated to improve lower back flexibility.',
     imageKey: 'seated-forward-bend.svg',
     videoKey: '13 - Setaed Forward Bend 720p.mp4',
-    groups: [groups[STOMACH]],
+    groups: [groups[CORE_ABDOMEN]],
     createdAt: now,
     updatedAt: now,
   },
@@ -370,7 +370,7 @@ const exercises = [
     description: 'Seated twisting movements to engage the core and improve spinal mobility.',
     imageKey: 'tummy-twists.svg',
     videoKey: '32 - Tummy Twists 720p.mp4',
-    groups: [groups[STOMACH]],
+    groups: [groups[CORE_ABDOMEN]],
     createdAt: now,
     updatedAt: now,
   },
@@ -445,7 +445,7 @@ const groupColors = {
   Shoulders: '#2196F3',
   Arms: '#FF9800',
   Chest: '#E91E63',
-  Stomach: '#9C27B0',
+  'Core/Abdomen': '#9C27B0',
   Legs: '#00BCD4',
   Hands: '#FF5722',
 };

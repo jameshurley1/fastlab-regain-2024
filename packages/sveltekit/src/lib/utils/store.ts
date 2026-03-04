@@ -31,7 +31,7 @@ export const activeAreas = new PersistedState<Area[]>(
 		},
 		{
 			id: '1cb15f70-c553-460e-833c-b4753f66bd25',
-			name: 'Stomach',
+			name: 'Core/Abdomen',
 			status: false
 		},
 		{
