@@ -25,6 +25,12 @@
 			year: 'numeric'
 		});
 	}
+
+	function formatDateTime(iso: string) {
+		const d = new Date(iso);
+		return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+			+ ' ' + d.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+	}
 </script>
 
 <svelte:head>
@@ -84,6 +90,34 @@
 											</table>
 										{:else}
 											<p class="no-sessions">No sessions recorded.</p>
+										{/if}
+									</div>
+
+									<div class="ratings-section">
+										<h4 class="ratings-heading">Pain &amp; Difficulty Ratings</h4>
+										{#if u.ratings?.length}
+											<table class="session-table">
+												<thead>
+													<tr>
+														<th>Date/Time</th>
+														<th>Exercise</th>
+														<th>Type</th>
+														<th>Rating</th>
+													</tr>
+												</thead>
+												<tbody>
+													{#each u.ratings.slice().sort((a: any, b: any) => b.timestamp.localeCompare(a.timestamp)) as r}
+														<tr class={r.type === 'pain' && r.rating >= 4 ? 'rating-high-pain' : ''}>
+															<td>{formatDateTime(r.timestamp)}</td>
+															<td class="exercise-id">{r.exerciseTitle}</td>
+															<td>{r.type === 'pain' ? 'Pain' : 'Difficulty'}</td>
+															<td><strong>{r.rating}</strong> / 6</td>
+														</tr>
+													{/each}
+												</tbody>
+											</table>
+										{:else}
+											<p class="no-sessions">No ratings recorded yet.</p>
 										{/if}
 									</div>
 								{/if}
@@ -173,5 +207,19 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+	.ratings-section {
+		margin-top: 1rem;
+	}
+	.ratings-heading {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #444;
+		margin: 0 0 0.4rem 0;
+	}
+	.rating-high-pain td {
+		background-color: #fff0f0;
+		color: #c0392b;
+		font-weight: 600;
 	}
 </style>

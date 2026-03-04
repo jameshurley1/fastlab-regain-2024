@@ -7,7 +7,7 @@
 	import Card, { Content, Actions } from '@smui/card';
 	import Button, { Label } from '@smui/button';
 
-	import { isPaused, difficult, pain } from '$lib/utils/store';
+	import { isPaused, difficult, pain, user } from '$lib/utils/store';
 	import { lazyLoad } from '$lib/utils/lazyload';
 	import { calculateRealTime } from '$lib/utils/calculateRealTime';
 	import Video from '$lib/components/Video.svelte';
@@ -142,7 +142,12 @@
 			</div>
 			{#if difficult.current || pain.current}
 				<div class="guage">
-					<Guage video={data?.exercises} type={pain.current ? 'pain' : 'difficult'} />
+					<Guage
+						video={data?.exercises}
+						type={pain.current ? 'pain' : 'difficult'}
+						userId={user.current.id}
+						exerciseId={data?.exercises?.id ?? ''}
+					/>
 				</div>
 			{/if}
 			<div class="guage">

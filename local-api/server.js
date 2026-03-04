@@ -43,6 +43,7 @@ function loadDb() {
       stats: [],
       messages: [],
       sessions: [],
+      ratings: [],
     };
     writeFileSync(DB_PATH, JSON.stringify(initial, null, 2));
     return initial;
@@ -472,6 +473,26 @@ async function handleRequest(req, res) {
     db.messages = db.messages.filter((m) => m.id !== body.id);
     saveDb(db);
     return json(res, { message: 'Message deleted' });
+  }
+
+  // =====================
+  // RATINGS ENDPOINTS
+  // =====================
+  if (method === 'GET' && pathname === '/ratings/list') {
+    if (!db.ratings) db.ratings = [];
+    return json(res, db.ratings);
+  }
+  if (method === 'GET' && (params = match('/ratings/{userId}', pathname))) {
+    if (!db.ratings) db.ratings = [];
+    return json(res, db.ratings.filter((r) => r.userId === params.userId));
+  }
+  if (method === 'POST' && pathname === '/ratings') {
+    const body = await parseBody(req);
+    if (!db.ratings) db.ratings = [];
+    if (!body.id) body.id = randomUUID();
+    db.ratings.push(body);
+    saveDb(db);
+    return json(res, body);
   }
 
   // --- 404 ---

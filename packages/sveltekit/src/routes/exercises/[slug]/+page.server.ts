@@ -34,6 +34,28 @@ export const actions = {
 		return keyResponse.json();
 	},
 
+	async submitRating({ request }: { request: Request }) {
+		const formData = await request.formData();
+		const userId = formData.get('userId')?.toString() || '';
+		const exerciseId = formData.get('exerciseId')?.toString() || '';
+		const type = formData.get('type')?.toString() || '';
+		const rating = parseInt(formData.get('rating')?.toString() || '0', 10);
+
+		await fetch(`${apiUrl}/ratings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				userId,
+				exerciseId,
+				type,
+				rating,
+				timestamp: new Date().toISOString()
+			})
+		});
+
+		return { success: true };
+	},
+
 	async submitReps({ request, locals }: { request: Request; locals: App.Locals }) {
 		const formData = await request.formData();
 		const exerciseId = formData.get('exerciseId')?.toString() || '';

@@ -1,50 +1,118 @@
 <script lang="ts">
-	import { difficult, pain } from '$lib/utils/store';
+	import { enhance } from '$app/forms';
+	import { interaction, pain, difficult } from '$lib/utils/store';
 	import Card, { Content, Actions } from '@smui/card';
 	import Button from '@smui/button';
 
-	let question: string = $state('');
-	let header: string = $state('');
+	let { type, video, userId, exerciseId }: {
+		type: string;
+		video: Exercise | undefined;
+		userId: string;
+		exerciseId: string;
+	} = $props();
 
-	const handleDifficult = (guage: number) => {
-		if (type === 'difficult') {
-			// Save the gauge value with the video to a user Stat
-			console.log('Difficulty rating:', guage, 'for video:', video?.title);
-			difficult.current = false;
-		}	else {
-			// Save the gauge value with the video to a user Stat
-			console.log('Pain rating:', guage, 'for video:', video?.title);
-			pain.current = false;
+	let formEl: HTMLFormElement | undefined = $state();
+	let selectedRating = $state(0);
+
+	let question = $derived(
+		type === 'difficult'
+			? 'How difficult was this exercise?'
+			: 'How much pain or discomfort are you feeling?'
+	);
+
+	const DIFFICULTY_BUTTONS = [
+		{ label: 'EASY', value: 1, color: '#69B34C' },
+		{ label: '2',    value: 2, color: '#ACB334' },
+		{ label: '3',    value: 3, color: '#FAB733' },
+		{ label: '4',    value: 4, color: '#FF8E15' },
+		{ label: '5',    value: 5, color: '#FF4E11' },
+		{ label: 'HARD', value: 6, color: '#FF0D0D' },
+	];
+
+	const PAIN_BUTTONS = [
+		{ label: 'NONE',   value: 1, color: '#69B34C' },
+		{ label: '2',      value: 2, color: '#ACB334' },
+		{ label: '3',      value: 3, color: '#FAB733' },
+		{ label: '4',      value: 4, color: '#FF8E15' },
+		{ label: '5',      value: 5, color: '#FF4E11' },
+		{ label: 'SEVERE', value: 6, color: '#FF0D0D' },
+	];
+
+	const buttons = $derived(type === 'difficult' ? DIFFICULTY_BUTTONS : PAIN_BUTTONS);
+
+	function selectRating(rating: number) {
+		selectedRating = rating;
+		formEl?.requestSubmit();
+	}
+
+	function showPostRatingMessage(rating: number) {
+		pain.current = false;
+		difficult.current = false;
+
+		if (type === 'pain') {
+			// PAIN THRESHOLD: currently set to 3. Review with clinicians before deployment.
+			if (rating <= 3) {
+				interaction.current = [
+					{
+						closeIcon: false,
+						message: "Thank you, we've noted that. Please take it easy.",
+						stayOn: false,
+						buttons: []
+					}
+				];
+				setTimeout(() => {
+					if (interaction.current && interaction.current[0]?.stayOn === false) {
+						interaction.current = null;
+					}
+				}, 5000);
+			} else {
+				interaction.current = [
+					{
+						closeIcon: false,
+						message:
+							'Please stop exercising if you are in pain. Contact your clinician or call 000 in an emergency.',
+						stayOn: true,
+						buttons: [{ title: 'I understand', result: 'dismiss' }]
+					}
+				];
+			}
 		}
-	};
-
-	$effect(() => {
-		if (type === 'difficult') {
-			question = 'hard';
-			header = "Complexity";
-		}	else {
-			question = 'painful';
-			header = "Pain";
-		}
-	})
-
-	let { type, video }: { type: string; video: Exercise | undefined } = $props();
+		// For difficulty: dismiss quietly, no message
+	}
 </script>
 
-<Card style="border-radius: 16px;">
-	<Content>
-		<h2 class="mdc-typography--headline6">{header}</h2>
-		<p>How {question} was it to perform this task today?</p>
-	</Content>
-	<Actions fullBleed>
-		<Button style="background: #69B34C; color: white;" onclick={() => handleDifficult(1)}>Easy</Button>
-		<Button style="background: #ACB334; color: white;" onclick={() => handleDifficult(2)}>2</Button>
-		<Button style="background: #FAB733; color: white;" onclick={() => handleDifficult(3)}>3</Button>
-		<Button style="background: #FF8E15; color: white;" onclick={() => handleDifficult(4)}>4</Button>
-		<Button style="background: #FF4E11; color: white;" onclick={() => handleDifficult(5)}>5</Button>
-		<Button style="background: #FF0D0D; color: white;" onclick={() => handleDifficult(6)}>Hard</Button>
-	</Actions>
-</Card>
+<form
+	bind:this={formEl}
+	method="POST"
+	action="?/submitRating"
+	use:enhance={() => {
+		return async ({ result }: { result: any }) => {
+			showPostRatingMessage(selectedRating);
+		};
+	}}
+>
+	<input type="hidden" name="userId" value={userId} />
+	<input type="hidden" name="exerciseId" value={exerciseId} />
+	<input type="hidden" name="type" value={type} />
+	<input type="hidden" name="rating" value={selectedRating} />
+
+	<Card style="border-radius: 16px;">
+		<Content>
+			<h2 class="mdc-typography--headline6">
+				{type === 'difficult' ? 'Complexity' : 'Pain'}
+			</h2>
+			<p>{question}</p>
+		</Content>
+		<Actions fullBleed>
+			{#each buttons as btn}
+				<Button
+					style="background: {btn.color}; color: white;"
+					onclick={() => selectRating(btn.value)}
+				>{btn.label}</Button>
+			{/each}
+		</Actions>
+	</Card>
+</form>
 <div class="spacer"></div>
 
 <style>

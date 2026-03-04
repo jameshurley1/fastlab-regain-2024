@@ -20,24 +20,23 @@
 		interaction.current = [
 			{
 				closeIcon: false,
-				message:
-					'Did you pause this video to catch up, or is Regain causing you discomfort or pain?',
+				message: 'Why did you pause?',
 				stayOn: true,
 				buttons: [
 					{
-						title: 'Technical issues',
+						title: 'APP PROBLEM',
 						result: 'technical'
 					},
 					{
-						title: 'Just Catching Up',
+						title: 'JUST RESTING',
 						result: 'catchup'
 					},
 					{
-						title: 'Difficulty',
+						title: 'TOO DIFFICULT',
 						result: 'difficult'
 					},
 					{
-						title: 'Pain',
+						title: 'PAIN OR DISCOMFORT',
 						result: 'pain'
 					}
 				]
@@ -73,17 +72,6 @@
 		];
 	};
 
-	const addComplimentMessage = (type: string) => {
-		interaction.current = [
-			{
-				closeIcon: false,
-				message: 'Tell us how much ' + type + " on the meter above, you'll be yourself in no time.",
-				stayOn: false,
-				buttons: []
-			}
-		];
-	};
-
 	const addHalfwayMessage = () => {
 		interaction.current = [
 			{
@@ -109,11 +97,11 @@
 		} else if (e === 'pain') {
 			interaction.current = null;
 			pain.current = true;
-			addComplimentMessage('pain');
 		} else if (e === 'difficult') {
 			interaction.current = null;
 			difficult.current = true;
-			addComplimentMessage('difficulty');
+		} else if (e === 'dismiss') {
+			interaction.current = null;
 		}
 	};
 
