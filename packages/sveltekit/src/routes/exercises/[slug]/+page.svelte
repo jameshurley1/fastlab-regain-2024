@@ -29,6 +29,7 @@
 	let finishedMode: boolean = $state(false);
 	let submitted: boolean = $state(false);
 	let dialogSubmitting: boolean = $state(false);
+	let progressRefresh: number = $state(0);
 	let playCount: number = $state(0);
 	let reps: number = $state(0);
 
@@ -61,7 +62,10 @@
 	}
 
 	$effect(() => {
-		if (submitted) showPostVideoButtons = false;
+		if (submitted) {
+			showPostVideoButtons = false;
+			progressRefresh += 1;
+		}
 	});
 </script>
 
@@ -196,7 +200,7 @@
 			</div>
 			{#if data?.exercises?.groups?.length > 0}
 				<div class="guage">
-					<BodyAreaProgress exercise={data.exercises} />
+					<BodyAreaProgress exercise={data.exercises} refreshTrigger={progressRefresh} />
 				</div>
 			{/if}
 		</Cell>

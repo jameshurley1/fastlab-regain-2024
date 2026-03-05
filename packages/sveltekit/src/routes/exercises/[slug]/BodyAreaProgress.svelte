@@ -4,7 +4,7 @@
 
 	const API = 'http://127.0.0.1:3001';
 
-	let { exercise }: { exercise: any } = $props();
+	let { exercise, refreshTrigger = 0 }: { exercise: any; refreshTrigger?: number } = $props();
 
 	let allExercises: any[] = $state([]);
 	let sessions: any[] = $state([]);
@@ -12,7 +12,7 @@
 
 	const area = $derived((exercise?.groups ?? [])[0]?.area ?? '');
 
-	onMount(async () => {
+	async function fetchData() {
 		const userId = user.current?.id;
 		const [exRes, sessRes] = await Promise.all([
 			fetch(`${API}/exercise/list`),
@@ -21,15 +21,21 @@
 		allExercises = await exRes.json();
 		sessions = sessRes ? await sessRes.json() : [];
 		loading = false;
+	}
+
+	onMount(fetchData);
+
+	$effect(() => {
+		// Re-fetch whenever refreshTrigger is incremented (after a rep submission)
+		if (refreshTrigger > 0) fetchData();
 	});
 
 	const userAssignments = $derived(user.current?.exercises ?? []);
 
 	function latestReps(exerciseId: string): number {
-		const relevant = sessions
+		return sessions
 			.filter((s) => s.exerciseId === exerciseId)
-			.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-		return relevant[0]?.repsCompleted ?? 0;
+			.reduce((sum, s) => sum + (s.repsCompleted ?? 0), 0);
 	}
 
 	const areaExercises = $derived.by(() => {

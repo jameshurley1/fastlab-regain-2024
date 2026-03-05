@@ -24,12 +24,11 @@
 	// The user's exercise assignments: [{ exerciseId, targetReps }]
 	const userAssignments = $derived(user.current?.exercises ?? []);
 
-	// For each assignment, find the most recent session's repsCompleted
+	// Sum repsCompleted across all sessions for this exercise
 	function latestReps(exerciseId: string): number {
-		const relevant = sessions
+		return sessions
 			.filter((s) => s.exerciseId === exerciseId)
-			.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-		return relevant[0]?.repsCompleted ?? 0;
+			.reduce((sum, s) => sum + (s.repsCompleted ?? 0), 0);
 	}
 
 	// Group assignments by body area, derived from the exercises' own group memberships.
