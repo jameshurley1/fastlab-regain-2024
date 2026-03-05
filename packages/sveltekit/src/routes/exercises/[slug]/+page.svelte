@@ -28,6 +28,7 @@
 	let showPostVideoButtons: boolean = $state(false);
 	let finishedMode: boolean = $state(false);
 	let submitted: boolean = $state(false);
+	let dialogSubmitting: boolean = $state(false);
 	let playCount: number = $state(0);
 	let reps: number = $state(0);
 
@@ -119,10 +120,30 @@
 				{#if showPostVideoButtons}
 					<div class="post-video-overlay">
 						{#if finishedMode}
-							<p class="save-now-prompt">
-								<i class="material-icons save-now-icon">arrow_downward</i>
-								Save Your Reps Now!
-							</p>
+							<div class="save-dialog">
+								<h2 class="save-dialog-title">Save Your Reps Now!</h2>
+								<form
+									method="POST"
+									action="?/submitReps"
+									use:enhance={({ cancel }) => {
+										if (dialogSubmitting) { cancel(); return; }
+										dialogSubmitting = true;
+										return async ({ result }: { result: any }) => {
+											dialogSubmitting = false;
+											if (result.type === 'success' || result.status === 200) {
+												submitted = true;
+											}
+										};
+									}}
+								>
+									<input type="hidden" name="exerciseId" value={data?.exercises?.id} />
+									<input type="hidden" name="repsCompleted" value={reps} />
+									<input type="hidden" name="videoCompleted" value={videoCompleted ? 'true' : 'false'} />
+									<Button type="submit" variant="raised" disabled={dialogSubmitting} style="width: 100%;">
+										<Label>{dialogSubmitting ? 'Saving\u2026' : 'Submit reps'}</Label>
+									</Button>
+								</form>
+							</div>
 						{:else}
 							<button class="post-video-btn post-video-btn--replay" onclick={playAgain}>
 								<i class="material-icons">replay</i> Play Again
@@ -231,27 +252,28 @@
 		background: #69b34c;
 		color: white;
 	}
-	.save-now-prompt {
+	.save-dialog {
+		background: white;
+		border-radius: 12px;
+		padding: 2rem 2.5rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
-		color: #ffeb3b;
-		font-size: 2rem;
-		font-weight: 800;
-		text-align: center;
-		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-		letter-spacing: 0.02em;
+		gap: 1.5rem;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+		min-width: 280px;
+		max-width: 90%;
+	}
+	.save-dialog-title {
 		margin: 0;
-		padding: 0 1rem;
-		animation: pulse-text 1.2s ease-in-out infinite;
+		font-size: 1.75rem;
+		font-weight: 800;
+		color: #1a1a1a;
+		text-align: center;
+		letter-spacing: 0.01em;
 	}
-	.save-now-icon {
-		font-size: 3rem !important;
-	}
-	@keyframes pulse-text {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.75; transform: scale(0.97); }
+	.save-dialog form {
+		width: 100%;
 	}
 	.placeholder {
 		display: flex;
