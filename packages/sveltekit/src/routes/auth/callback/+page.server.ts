@@ -44,6 +44,10 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 	const user = await userResponse.json();
 
+	if (user.isAdmin) {
+		redirect(303, '/admin');
+	}
+
 	return {
 		user
 	};
