@@ -4,40 +4,20 @@
 	import Button from '@smui/button';
 	import { goto } from '$app/navigation';
 
-	let form: HTMLFormElement;
+	let { data }: { data: any } = $props();
 
 	$effect(() => {
 		user.current = data.user;
 	});
-
-	const redirect = () => {
-		if (form) form.requestSubmit();
-	};
-
-	setTimeout(redirect, 10000);
-
-	let { data }: { data: any } = $props();
 </script>
 
 <div class="wrapper">
 	<Card>
 		<Content>
-			<h5>Successfully Logged in...</h5>
-			<form bind:this={form} class="form" method="POST" action="?/redirect">
-				{#if !user.current.onboard}
-					<input hidden name="location" value="/settings" />
-					<p>Looks like this is your first time using Regain.</p>
-					<p>You will be redirected to the onboarding process.</p>
-					<p>Wait 10 seconds to be automatically redirected, or click next to skip.</p>
-					<Button variant="raised" onclick={() => goto('/settings')}>Next</Button>
-				{:else}
-					<input hidden name="location" value="/exercises" />
-					<p>Looks like you've been using Regain before.</p>
-					<p>You will be redirected to your regular scheduled exercises.</p>
-					<p>Wait 10 seconds to be automatically redirected, or click next to skip.</p>
-					<Button variant="raised" onclick={() => goto('/exercises')}>Next</Button>
-				{/if}
-			</form>
+			<h2>Welcome to Regain</h2>
+			<p class="email">{data.user?.email}</p>
+			<p>Below are your assigned exercises</p>
+			<Button variant="raised" onclick={() => goto('/exercises')}>Let's Go!</Button>
 		</Content>
 	</Card>
 </div>
@@ -52,5 +32,14 @@
 		background: rgba(255, 255, 255, 0.1);
 		width: 100vw;
 		z-index: 0;
+	}
+
+	h2 {
+		margin: 0 0 0.5rem;
+	}
+
+	.email {
+		font-weight: bold;
+		margin: 0 0 0.75rem;
 	}
 </style>
