@@ -128,6 +128,7 @@
 	}
 	.bar-fill {
 		height: 100%;
+		max-width: 100%;
 		border-radius: 3px;
 		transition: width 0.4s ease;
 	}
