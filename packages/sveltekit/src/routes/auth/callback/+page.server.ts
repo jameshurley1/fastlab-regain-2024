@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 	const user = await userResponse.json();
 
-	if (user.isAdmin) {
+	if (user.isAdmin || user.email === 'admin@fastlab.com') {
 		redirect(303, '/admin');
 	}
 

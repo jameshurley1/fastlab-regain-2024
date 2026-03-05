@@ -398,6 +398,7 @@ const users = [
   {
     id: randomUUID(),
     email: 'admin@fastlab.com',
+    isAdmin: true,
     onboard: true,
     overallProgress: 0,
     groups: [],

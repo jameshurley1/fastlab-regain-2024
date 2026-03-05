@@ -12,11 +12,11 @@
 </script>
 
 <div class="wrapper">
-	<Card>
+	<Card class="welcome-card">
 		<Content>
 			<h2>Welcome to Regain</h2>
 			<p class="email">{data.user?.email}</p>
-			<p>Below are your assigned exercises</p>
+			<p>Click below to go to your assigned exercises</p>
 			<Button variant="raised" onclick={() => goto('/exercises')}>Let's Go!</Button>
 		</Content>
 	</Card>
@@ -34,12 +34,39 @@
 		z-index: 0;
 	}
 
+	:global(.welcome-card) {
+		min-width: 560px;
+		padding: 2rem;
+	}
+
+	:global(.welcome-card .mdc-card__content) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+		padding: 2rem !important;
+	}
+
 	h2 {
-		margin: 0 0 0.5rem;
+		font-size: 2.5rem;
+		margin: 0;
 	}
 
 	.email {
+		font-size: 1.4rem;
 		font-weight: bold;
-		margin: 0 0 0.75rem;
+		margin: 0;
+	}
+
+	p:not(.email) {
+		font-size: 1.25rem;
+		margin: 0;
+	}
+
+	:global(.welcome-card .mdc-button) {
+		transform: scale(1.5);
+		transform-origin: center;
+		margin-top: 0.75rem;
+		margin-bottom: 0.75rem;
 	}
 </style>
