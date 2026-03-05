@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import type { PageData } from './$types';
 
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
@@ -29,6 +30,7 @@
 	let finishedMode: boolean = $state(false);
 	let submitted: boolean = $state(false);
 	let dialogSubmitting: boolean = $state(false);
+	let dialogFormEl: HTMLFormElement | undefined = $state();
 	let progressRefresh: number = $state(0);
 	let playCount: number = $state(0);
 	let reps: number = $state(0);
@@ -64,7 +66,7 @@
 	$effect(() => {
 		if (submitted) {
 			showPostVideoButtons = false;
-			progressRefresh += 1;
+			untrack(() => { progressRefresh += 1; });
 		}
 	});
 </script>
@@ -127,6 +129,7 @@
 							<div class="save-dialog">
 								<h2 class="save-dialog-title">Save Your Reps Now!</h2>
 								<form
+									bind:this={dialogFormEl}
 									method="POST"
 									action="?/submitReps"
 									use:enhance={({ cancel }) => {
@@ -143,7 +146,12 @@
 									<input type="hidden" name="exerciseId" value={data?.exercises?.id} />
 									<input type="hidden" name="repsCompleted" value={reps} />
 									<input type="hidden" name="videoCompleted" value={videoCompleted ? 'true' : 'false'} />
-									<Button type="submit" variant="raised" disabled={dialogSubmitting} style="width: 100%;">
+									<Button
+										variant="raised"
+										disabled={dialogSubmitting}
+										style="width: 100%;"
+										onclick={(e) => { e.preventDefault(); dialogFormEl?.requestSubmit(); }}
+									>
 										<Label>{dialogSubmitting ? 'Saving\u2026' : 'Submit reps'}</Label>
 									</Button>
 								</form>
