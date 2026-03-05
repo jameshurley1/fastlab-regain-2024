@@ -4,9 +4,7 @@
 
 <div class="wrap">
 	<h6>&copy; 2025</h6>
-	<a href="https://fastlab.soci.org.au/"
-		><img src={Fastlab} alt={Fastlab} height="140px" width="auto" /></a
-	>
+	<img src={Fastlab} alt="FASTLab" height="140px" width="auto" />
 	<h6>
 		<a href="/admin">v2.0.0 | </a>
 		<a href="/tos">Terms of Service | </a>
@@ -29,12 +27,11 @@
 	}
 	a {
 		text-decoration: none;
-		height: 140px;
 	}
 	a:visited {
 		color: var(--color-surface);
 	}
-	h6 {
+h6 {
 		padding-top: 12px;
 	}
 </style>

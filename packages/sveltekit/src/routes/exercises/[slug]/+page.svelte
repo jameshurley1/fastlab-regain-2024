@@ -16,6 +16,7 @@
 	import Controls from './Controls.svelte';
 	import Guage from './Guage.svelte';
 	import RepCounter from './RepCounter.svelte';
+	import BodyAreaProgress from './BodyAreaProgress.svelte';
 
 	let loaded: boolean = $state(false);
 	let notfound: boolean = $state(false);
@@ -25,6 +26,8 @@
 	let action: { success: boolean; key: string } = $state({ success: false, key: '' });
 	let videoCompleted: boolean = $state(false);
 	let showPostVideoButtons: boolean = $state(false);
+	let finishedMode: boolean = $state(false);
+	let submitted: boolean = $state(false);
 	let playCount: number = $state(0);
 	let reps: number = $state(0);
 
@@ -53,8 +56,12 @@
 	}
 
 	function finishedForNow() {
-		showPostVideoButtons = false;
+		finishedMode = true;
 	}
+
+	$effect(() => {
+		if (submitted) showPostVideoButtons = false;
+	});
 </script>
 
 <form
@@ -111,12 +118,19 @@
 				</div>
 				{#if showPostVideoButtons}
 					<div class="post-video-overlay">
-						<button class="post-video-btn post-video-btn--replay" onclick={playAgain}>
-							<i class="material-icons">replay</i> Play Again
-						</button>
-						<button class="post-video-btn post-video-btn--done" onclick={finishedForNow}>
-							<i class="material-icons">check</i> Finished for now
-						</button>
+						{#if finishedMode}
+							<p class="save-now-prompt">
+								<i class="material-icons save-now-icon">arrow_downward</i>
+								Save Your Reps Now!
+							</p>
+						{:else}
+							<button class="post-video-btn post-video-btn--replay" onclick={playAgain}>
+								<i class="material-icons">replay</i> Play Again
+							</button>
+							<button class="post-video-btn post-video-btn--done" onclick={finishedForNow}>
+								<i class="material-icons">check</i> Finished for now
+							</button>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -155,9 +169,15 @@
 					exerciseId={data?.exercises?.id}
 					targetReps={data?.targetReps ?? 10}
 					bind:reps
+					bind:submitted
 					{videoCompleted}
 				/>
 			</div>
+			{#if data?.exercises?.groups?.length > 0}
+				<div class="guage">
+					<BodyAreaProgress exercise={data.exercises} />
+				</div>
+			{/if}
 		</Cell>
 	</LayoutGrid>
 	<Messages />
@@ -210,6 +230,28 @@
 	.post-video-btn--done {
 		background: #69b34c;
 		color: white;
+	}
+	.save-now-prompt {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		color: #ffeb3b;
+		font-size: 2rem;
+		font-weight: 800;
+		text-align: center;
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+		letter-spacing: 0.02em;
+		margin: 0;
+		padding: 0 1rem;
+		animation: pulse-text 1.2s ease-in-out infinite;
+	}
+	.save-now-icon {
+		font-size: 3rem !important;
+	}
+	@keyframes pulse-text {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.75; transform: scale(0.97); }
 	}
 	.placeholder {
 		display: flex;

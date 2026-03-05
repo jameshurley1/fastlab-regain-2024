@@ -8,14 +8,16 @@
 		exerciseId,
 		targetReps = 10,
 		reps = $bindable(0),
-		videoCompleted = false
+		videoCompleted = false,
+		submitted = $bindable(false)
 	}: {
 		exerciseId: string;
 		targetReps?: number;
 		reps?: number;
 		videoCompleted?: boolean;
+		submitted?: boolean;
 	} = $props();
-	let submitted = $state(false);
+	let submittedReps = $state(0);
 	let submitting = $state(false);
 
 	function decrement() {
@@ -67,7 +69,7 @@
 		{#if submitted}
 			<p class="submitted-msg">
 				<i class="material-icons" style="vertical-align: middle;">check_circle</i>
-				Saved!
+				You've done {submittedReps} rep{submittedReps === 1 ? '' : 's'} — data saved!
 			</p>
 		{:else}
 			<form
@@ -79,6 +81,7 @@
 					return async ({ result }: { result: any }) => {
 						submitting = false;
 						if (result.type === 'success' || result.status === 200) {
+							submittedReps = reps;
 							submitted = true;
 						}
 					};
